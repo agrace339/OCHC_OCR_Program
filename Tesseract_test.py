@@ -15,8 +15,7 @@ def makeTextFile(file_name):
 	text = pytesseract.image_to_data(Image.open(file_name), lang='eng', output_type='data.frame')
 	text = text[text.conf != -1]
 
-	lines = text.groupby(['page_num', 'block_num', 'par_num', 'line_num'])['text'] \
-										 .apply(lambda x: ' '.join(list(x))).tolist()
+	lines = text.groupby(['page_num', 'block_num', 'par_num', 'line_num'])['text'].apply(lambda x: ' '.join(list(x))).tolist()
 	confs = text.groupby(['page_num', 'block_num', 'par_num', 'line_num'])['conf'].mean().tolist()
 
 	line_conf = []
