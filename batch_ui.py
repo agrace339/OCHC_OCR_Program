@@ -1,13 +1,21 @@
 import tkinter as tk
+from TkinterDnD2 import DND_FILES, TkinterDnD
 
-def main():
-	#Create Tkinter window.
-	window = tk.Tk()
-	greeting = tk.Label(text="Hello, Tkinter")
+#Install tkdnd2.8 in \tcl of Python install. https://sourceforge.net/projects/tkdnd/
+#Install TkinterDnD2 in the \Lib\site-packages of Python install. https://sourceforge.net/projects/tkinterdnd/
 
-	#We won't keep this code later, just meant for 
-	#keeping the window up for now.
-	input_thing = input()
+#Drag and drop information and code provided by https://stackoverflow.com/questions/25427347/how-to-install-and-use-tkdnd-with-python-tkinter-on-osx/46856247#46856247
+def drop_in(event):
+	list_box.insert("end", event.data)
 
-if __name__ == '__main__':
-	main()
+#Create Tkinter window.
+window = TkinterDnD.Tk()
+window.geometry("800x600")
+#greeting = tk.Label(text="Hello, Tkinter")
+
+list_box = tk.Listbox(window, selectmode=tk.SINGLE, background="White")
+list_box.pack(fill=tk.X)
+list_box.drop_target_register(DND_FILES)
+list_box.dnd_bind("<<Drop>>", drop_in)
+	
+window.mainloop()
