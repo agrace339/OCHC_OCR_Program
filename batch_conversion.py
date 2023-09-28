@@ -23,7 +23,7 @@ def batch_jpg_to_pdf(folder_name):
 	imgs = []
 	for r, _, f in os.walk(img_dir):
 		for fname in f:
-			if not fname.endswith(".jpg"):
+			if not fname.endswith(".jpg") and not fname.endswith(".tif"):
 				continue
 			imgs.append(os.path.join(r, fname))
 	#Converts all images in directory to pdfs.
@@ -43,8 +43,8 @@ def main():
 	in_element = sys.argv[1]
 
 	#regular expression to determine if input element is file or folder.
-	in_file = re.match(r"[a-zA-Z]+.jpg", in_element)
-	in_folder = re.match(r"/[a-zA-Z]+", in_element)
+	in_file = re.match(r"[a-zA-Z0-9]+.(jpg|tif)", in_element)
+	in_folder = re.match(r"/[a-zA-Z0-9]+", in_element)
 
 	#If single file given, convert just that file.
 	if in_file:
