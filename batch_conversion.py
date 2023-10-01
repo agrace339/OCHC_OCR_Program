@@ -3,6 +3,8 @@ import os
 import img2pdf
 import re
 
+#Install img2pdf by typing command "pip3 install img2pdf" in terminal
+
 def file_to_pdf(file):
 #Converts single JPEG file to a PDF.
 	#CITE: https://github.com/josch/img2pdf
