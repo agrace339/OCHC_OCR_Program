@@ -3,7 +3,7 @@ import os
 import img2pdf
 import re
 
-def jpg_to_pdf(file):
+def file_to_pdf(file):
 #Converts single JPEG file to a PDF.
 	#CITE: https://github.com/josch/img2pdf
 	#DESC: Open source code from IMG2PDF github
@@ -11,10 +11,9 @@ def jpg_to_pdf(file):
 	with open("name.pdf","wb") as f:
 		f.write(img2pdf.convert(file))
 
-def batch_jpg_to_pdf(folder_name):
+def folder_to_pdf(folder_name):
 #Convert all JPEG files in a folder into one multi-page pdf file.
 	#Get current working directory.
-	
 	img_dir = os.getcwd() + folder_name
 
 	#CITE: https://github.com/josch/img2pdf
@@ -30,10 +29,6 @@ def batch_jpg_to_pdf(folder_name):
 	with open("name.pdf","wb") as f:
 		f.write(img2pdf.convert(imgs))
 
-	# multiple inputs (variant 2)
-	#with open("name.pdf","wb") as f:
-	#	f.write(img2pdf.convert(["test1.jpg", "test2.png"]))
-
 def main():
 	#If no JPEG or TIFF file given, raise error.
 	if (len(sys.argv) <= 1):
@@ -42,20 +37,19 @@ def main():
 	#Take argument from command line as input file.
 	in_element = sys.argv[1]
 
-	#regular expression to determine if input element is file or folder.
+	#Regular expressions to determine if input element is file or folder.
 	in_file = re.match(r"[a-zA-Z0-9]+.(jpg|tif)", in_element)
 	in_folder = re.match(r"/[a-zA-Z0-9]+", in_element)
 
-	#If single file given, convert just that file.
+	#If single file given, convert just that file to a pdf.
 	if in_file:
-		print("file")
-		jpg_to_pdf(in_element)
-	#If folder is given, convert all jpeg files in folder.
+		file_to_pdf(in_element)
+	#If folder is given, convert all image files to pdfs in folder.
 	elif in_folder:
-		print("folder!")
-		batch_jpg_to_pdf(in_element)
+		folder_to_pdf(in_element)
+	#If argument is invalid, raise exception.
 	else:
-		print("Not valid file or folder name.")
+		raise Exception("Not valid file or folder name.")
 
 if __name__ == '__main__':
 	main()
