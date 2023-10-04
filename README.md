@@ -7,10 +7,11 @@
 <br>Make sure that the interpreter you use to run and compiler batch_ui.py is using the same install folder of Python that the TkinterDnD is installed.
 
 ## How to Set Up Authentification For Google Document AI
+First install the neccessary packages. We use pip, but feel free to use whatever you already have installed.
 ```
-pip3 install --upgrade google-cloud-documentai
-pip3 install --upgrade google-cloud-storage
-pip3 install --upgrade google-cloud-documentai-toolbox
+pip install --upgrade google-cloud-documentai
+pip install --upgrade google-cloud-storage
+pip install --upgrade google-cloud-documentai-toolbox
 ```
 <br>Go to https://cloud.google.com/sdk/docs/install to install Google Cloud SDK.
 <br>Extract archive and run ```./google-cloud-sdk/install.sh``` and reply no, yes, no to the prompts.
