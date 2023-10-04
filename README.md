@@ -6,6 +6,13 @@
 <br>Download and install TkinterDnD2 in the \Lib\site-packages of Python install. https://sourceforge.net/projects/tkinterdnd/
 <br>Make sure that the interpreter you use to run and compiler batch_ui.py is using the same install folder of Python that the TkinterDnD is installed.
 
+## How to Set Up batch_conversion.py - Batch Conversion from TIFF and JPEG files to PDF files
+Install the necessary package, img2pdf.
+```
+pip3 install img2pdf
+```
+If the packages os, sys, or re are not updated or installed, pip3 install ____ (the package you are missing).
+
 ## How to Set Up Authentification For Google Document AI
 First install the neccessary packages. We use pip, but feel free to use whatever you already have installed.
 ```
