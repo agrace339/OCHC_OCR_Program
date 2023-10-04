@@ -13,7 +13,7 @@ pip install --upgrade google-cloud-documentai
 pip install --upgrade google-cloud-storage
 pip install --upgrade google-cloud-documentai-toolbox
 ```
-<br>Go to https://cloud.google.com/sdk/docs/install to install Google Cloud SDK.
+Go to https://cloud.google.com/sdk/docs/install to install Google Cloud SDK.
 <br>Extract archive and run ```./google-cloud-sdk/install.sh``` and reply no, yes, no to the prompts.
 <br>Then run ```./google-cloud-sdk/bin/gcloud init```, log into account and select the correct project.
 <br>If gcloud command is not found after running this command, run ```source ~/.bashrc```
