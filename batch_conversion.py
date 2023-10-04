@@ -31,16 +31,19 @@ def folder_to_pdf(folder_name):
 	with open("name.pdf","wb") as f:
 		f.write(img2pdf.convert(imgs))
 
-def main():
+def main(files):
 	#If no JPEG or TIFF file given, raise error.
-	if (len(sys.argv) <= 1):
-		raise Exception("No file given.")
+	#print(files.type())
+	#if () <= 1):
+	#	raise Exception("No file given.")
+
+	print(files[0])
 
 	#Take argument from command line as input file.
-	in_element = sys.argv[1]
+	in_element = files[0]
 
 	#Regular expressions to determine if input element is file or folder.
-	in_file = re.match(r"[a-zA-Z0-9]+.(jpg|tif)", in_element)
+	in_file = re.match(r"[/a-zA-Z0-9]+.(jpg|tif)", in_element)
 	in_folder = re.match(r"/[a-zA-Z0-9]+", in_element)
 
 	#If single file given, convert just that file to a pdf.
@@ -52,6 +55,7 @@ def main():
 	#If argument is invalid, raise exception.
 	else:
 		raise Exception("Not valid file or folder name.")
+
 
 if __name__ == '__main__':
 	main()
