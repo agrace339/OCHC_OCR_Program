@@ -11,7 +11,7 @@ Install the necessary package, img2pdf.
 ```
 pip3 install img2pdf
 ```
-If the packages os, sys, or re are not updated or installed, pip3 install ____ (the package you are missing).
+If the packages os, sys, or re are not updated or installed, '''pip3 install ____''' (the package you are missing).
 
 ## How to Set Up Authentification For Google Document AI
 First install the neccessary packages. We use pip, but feel free to use whatever you already have installed.
