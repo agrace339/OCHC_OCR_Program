@@ -15,8 +15,9 @@ def convert():
 	pop_up("Files successfully converted!")
 
 def pop_up(message):
-	popUpWindow = TkinterDnD.tk()
-	popUpWindow.geometry("300x200")
+	popUpWindow = TkinterDnD.Tk()
+	popUpWindow.configure(bg = "#d9d9d9")
+	popUpWindow.geometry("300x100")
 	textMessage = tk.Label(popUpWindow, text=message)
 	textMessage.pack(side="top", fill="x", pady=10)
 	confirmButton = tk.Button(popUpWindow, text="Confirm", command = popUpWindow.destroy)
@@ -25,18 +26,19 @@ def pop_up(message):
 
 #Create Tkinter window.
 window = TkinterDnD.Tk()
+window.configure(bg = "#d9d9d9")
 window.geometry("800x600")
 window.title("Drag and drop your files below.")
 #greeting = tk.Label(text="Hello, Tkinter")
 
-list_box = tk.Listbox(window, selectmode=tk.SINGLE, background="d9d9d9")
+list_box = tk.Listbox(window, selectmode=tk.SINGLE, background="#999999")
 list_box.pack(fill=tk.X)
 list_box.drop_target_register(DND_FILES)
 list_box.dnd_bind("<<Drop>>", drop_in)
 file_location = [list_box.get(0, last=None)]
 
 #If convert button is pressed, get contents of listbox and convert.
-convert_button = tk.Button(window, text= "Hello!", command = convert)
+convert_button = tk.Button(window, text= "Hello!", command = convert, background = "#3c78d8")
 convert_button.place(x=400, y=500)
 
 window.mainloop()
