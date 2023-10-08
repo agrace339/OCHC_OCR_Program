@@ -12,6 +12,16 @@ def drop_in(event):
 
 def convert():
 	batch_conversion.main(list_box.get('0', 'end'))
+	pop_up("Files successfully converted!")
+
+def pop_up(message):
+	popUpWindow = TkinterDnD.tk()
+	popUpWindow.geometry("300x200")
+	textMessage = tk.Label(popUpWindow, text=message)
+	textMessage.pack(side="top", fill="x", pady=10)
+	confirmButton = tk.Button(popUpWindow, text="Confirm", command = popUpWindow.destroy)
+	confirmButton.pack()
+	popUpWindow.mainloop()
 
 #Create Tkinter window.
 window = TkinterDnD.Tk()
@@ -19,7 +29,7 @@ window.geometry("800x600")
 window.title("Drag and drop your files below.")
 #greeting = tk.Label(text="Hello, Tkinter")
 
-list_box = tk.Listbox(window, selectmode=tk.SINGLE, background="White")
+list_box = tk.Listbox(window, selectmode=tk.SINGLE, background="d9d9d9")
 list_box.pack(fill=tk.X)
 list_box.drop_target_register(DND_FILES)
 list_box.dnd_bind("<<Drop>>", drop_in)
