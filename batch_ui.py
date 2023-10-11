@@ -17,6 +17,9 @@ def convert():
 	#pop_up("Files successfully converted!")
 	ocr_page()
 
+def ocr():
+	print("OCR happens here")
+
 #Creates OCR page.
 def ocr_page():
 	#Destroys drag and drop page.
@@ -24,6 +27,8 @@ def ocr_page():
 	convert_button.destroy()
 	#Creates new OCR page.
 	window.title("OCR processing")
+	ocr_button = tk.Button(window, text= "Perform OCR", command = ocr, background = "#3c78d8")
+	ocr_button.place(x=375, y=500)
 
 # Creates pop up window to confirm the files were successfully converted.
 def pop_up(message):
