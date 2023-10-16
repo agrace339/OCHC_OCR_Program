@@ -1,5 +1,7 @@
+from venv import create
 from google.api_core.client_options import ClientOptions
 from google.cloud import documentai
+from google.cloud.documentai_toolbox import gcs_utilities
 import os
 
 # How to set up authentification
@@ -7,60 +9,81 @@ import os
 # pip3 install --upgrade google-cloud-storage
 # pip3 install --upgrade google-cloud-documentai-toolbox
 # Go to https://cloud.google.com/sdk/docs/install to install Google Cloud SDK
-# extract archive and run ./google-cloud-sdk/install.sh
-# say no, yes, no to the prompts
-# then run ./google-cloud-sdk/bin/gcloud init, log into account and select project
+# Extract archive and run ./google-cloud-sdk/install.sh
+# Say no, yes, no to the prompts
+# Then run ./google-cloud-sdk/bin/gcloud init, log into account and select project
 # If gcloud command is not found after running this command, run source ~/.bashrc
 # Then run gcloud auth application-default login
 # It should be all set!
 
+class DocumentAI:
+    PROJECT_ID = "ochc-ocr" #project name on Cloud Console
+    LOCATION = "us"  # Format is 'us' or 'eu'
+    PROCESSOR_ID = "3cb371dd084861ed"  # Create processor in Cloud Console, can be changed to test other processors
+    RESOURCE_NAME = ""
+    DOCAI_CLIENT = ""
 
-PROJECT_ID = "ochc-ocr"
-LOCATION = "us"  # Format is 'us' or 'eu'
-PROCESSOR_ID = "3cb371dd084861ed"  # Create processor in Cloud Console
+    def __init__(self):
+            DOCAI_CLIENT = documentai.DocumentProcessorServiceClient(
+                client_options=ClientOptions(api_endpoint=f"{LOCATION}-documentai.googleapis.com")
+            )
+            RESOURCE_NAME = DOCAI_CLIENT.processor_path(PROJECT_ID, LOCATION, PROCESSOR_ID)
+            # Instantiates a client (Connect to API)
+            
 
-def makeTextFile(file_name, file_path, mime_type):
-	# Read the file into memory
-    with open(file_path, "rb") as image:
-        image_content = image.read()
-	
-    # Load Binary Data into Document AI RawDocument Object
-    raw_document = documentai.RawDocument(content=image_content, mime_type=mime_type)
+    def convertBatch(file_path, output_type, batch_size = 50):
+        # Get list of files from path
+        dir_list = os.listdir(file_path)
+        __createBatch()
 
-    # Configure the process request
-    request = documentai.ProcessRequest(name=RESOURCE_NAME, raw_document=raw_document)
+    def convertFile(file_path, output_type):
+        dir_list = os.listdir(file_path)
+        # Refer to https://cloud.google.com/document-ai/docs/file-types for supported file types
+        # Reads from ./files path and identifies files that can be transcribed
+        for i in range(len(dir_list)):
+            if ".jpg" in dir_list[i].lower():
+                __makeTextFile(dir_list[i],"./files/"+dir_list[i], "image/jpeg", output_type)
+            elif ".tif" in dir_list[i].lower():
+                __makeTextFile(dir_list[i],"./files/"+dir_list[i], "image/tiff", output_type)
+            elif ".pdf" in dir_list[i].lower():
+                __makeTextFile(dir_list[i],"./files/"+dir_list[i], "application/pdf", output_type)
 
-    # Use the Document AI client to process the sample form
-    result = docai_client.process_document(request=request)
+    def __makeTextFile(file_name, file_path, mime_type):
+        # Read the file into memory
+        with open(file_path, "rb") as image:
+            image_content = image.read()
+        
+        # Load Binary Data into Document AI RawDocument Object
+        raw_document = documentai.RawDocument(content=image_content, mime_type=mime_type)
 
-    document_object = result.document
-    output_name = file_name.split(".")[0] + ".txt"
-    print(output_name)
-    print("Document processing complete.")
-    #print(f"Text: {document_object.text}")
+        # Configure the process request
+        request = documentai.ProcessRequest(name=RESOURCE_NAME, raw_document=raw_document)
 
-    with open(output_name, "w") as text_file:
-		    text_file.write(document_object.text)
+        # Use the Document AI client to process the sample form
+        result = DOCAI_CLIENT.process_document(request=request)
 
-# Instantiates a client
-docai_client = documentai.DocumentProcessorServiceClient(
-    client_options=ClientOptions(api_endpoint=f"{LOCATION}-documentai.googleapis.com")
-)
+        document_object = result.document
+        print("Document processing complete.")
 
-# The full resource name of the processor, e.g.:
-# projects/project-id/locations/location/processor/processor-id
-# You must create new processors in the Cloud Console first
-RESOURCE_NAME = docai_client.processor_path(PROJECT_ID, LOCATION, PROCESSOR_ID)
+        # Create .txt file with transcribed text
+        output_name = "./txt_files/" + file_name.split(".")[0] + output_type
+        with open(output_name, "w") as text_file:
+                text_file.write(document_object.text)
 
-path = r"./files"
-dir_list = os.listdir(path)
+    def __createBatch(gcs_bucket_name, file_path, batch_size = 50):
+    # Creating batches of documents for processing
+    batches = gcs_utilities.create_batches(
+        gcs_bucket_name=gcs_bucket_name, gcs_prefix=gcs_prefix, batch_size=batch_size
+    )
 
-# Refer to https://cloud.google.com/document-ai/docs/file-types
-# for supported file types
-for i in range(len(dir_list)):
-       if ".jpg" in dir_list[i] or ".JPG" in dir_list[i]:
-                makeTextFile(dir_list[i],"./files/"+dir_list[i], "image/jpeg")
-       elif ".tif" in dir_list[i]:
-		        makeTextFile(dir_list[i],"./files/"+dir_list[i], "image/tiff")
-       elif ".pdf" in dir_list[i]:
-                makeTextFile(dir_list[i],"./files/"+dir_list[i], "application/pdf")
+    print(f"{len(batches)} batch(es) created.")
+    for batch in batches:
+        print(f"{len(batch.gcs_documents.documents)} files in batch.")
+        print(batch.gcs_documents.documents)
+
+        # Use as input for batch_process_documents()
+        # Refer to https://cloud.google.com/document-ai/docs/send-request
+        # for how to send a batch processing request
+        request = documentai.BatchProcessRequest(
+            name="processor_name", input_documents=batch
+        )
