@@ -11,6 +11,10 @@ import batch_conversion
 def drop_in(event):
 	list_box.insert("end", event.data)	
 
+def show_selection():
+	selection = list_box.get(list_box.curselection())
+	variable.set(selection)
+
 #Converts files and displays pop-up message when complete.
 def convert():
 	batch_conversion.main(list_box.get(0, 'end'))
@@ -43,6 +47,7 @@ def pop_up(message):
 	confirmButton.pack()
 	popUpWindow.mainloop()
 
+variable = StringValue()
 #Create Tkinter window.
 window = TkinterDnD.Tk()
 window.configure(bg = "#d9d9d9")
