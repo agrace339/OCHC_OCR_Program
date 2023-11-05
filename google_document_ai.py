@@ -61,7 +61,7 @@ class DocumentAI:
         print("Document processing complete.")
 
         # Create .txt file with transcribed text
-        output_name = "./txt_files/" + file_name.split(".")[0] + output_type
+        output_name = "txt_files_" + file_name.split(".")[0] + output_type
         with open(output_name, "w") as text_file:
                 text_file.write(document_object.text)
 
