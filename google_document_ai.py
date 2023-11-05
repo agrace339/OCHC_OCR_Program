@@ -18,11 +18,11 @@ import os
 
 class DocumentAI:
 
-    def __init__(self, PROJECT_ID = "ochc-ocr", LOCATION = "us", PROCESSOR_ID = "3cb371dd084861ed", RESOURCE_NAME = ""):
+    def __init__(self, PROJECT_ID = "ochc-ocr", LOCATION = "us", PROCESSOR_ID = "3cb371dd084861ed"):
         self.docaiclient = documentai.DocumentProcessorServiceClient(
             client_options=ClientOptions(api_endpoint=f"{LOCATION}-documentai.googleapis.com")
         )
-        RESOURCE_NAME = self.docaiclient.processor_path(PROJECT_ID, LOCATION, PROCESSOR_ID)
+        self.resource_name = self.docaiclient.processor_path(PROJECT_ID, LOCATION, PROCESSOR_ID)
         # Instantiates a client (Connect to API)
             
 
@@ -37,13 +37,13 @@ class DocumentAI:
         # Reads from ./files path and identifies files that can be transcribed
         for i in range(len(dir_list)):
             if ".jpg" in dir_list[i].lower():
-                __makeTextFile(dir_list[i],"./files/"+dir_list[i], "image/jpeg", output_type)
+                self.__makeTextFile(dir_list[i],"./files/"+dir_list[i], "image/jpeg", output_type)
             elif ".tif" in dir_list[i].lower():
-                __makeTextFile(dir_list[i],"./files/"+dir_list[i], "image/tiff", output_type)
+                self.__makeTextFile(dir_list[i],"./files/"+dir_list[i], "image/tiff", output_type)
             elif ".pdf" in dir_list[i].lower():
-                __makeTextFile(dir_list[i],"./files/"+dir_list[i], "application/pdf", output_type)
+                self.__makeTextFile(dir_list[i],"./files/"+dir_list[i], "application/pdf", output_type)
 
-    def __makeTextFile(self, file_name, file_path, mime_type):
+    def __makeTextFile(self, file_name, file_path, mime_type, output_type):
         # Read the file into memory
         with open(file_path, "rb") as image:
             image_content = image.read()
@@ -52,7 +52,7 @@ class DocumentAI:
         raw_document = documentai.RawDocument(content=image_content, mime_type=mime_type)
 
         # Configure the process request
-        request = documentai.ProcessRequest(name=RESOURCE_NAME, raw_document=raw_document)
+        request = documentai.ProcessRequest(name=self.resource_name, raw_document=raw_document)
 
         # Use the Document AI client to process the sample form
         result = self.docaiclient.process_document(request=request)
