@@ -1,6 +1,7 @@
 import tkinter as tk
 from TkinterDnD2 import DND_FILES, TkinterDnD
 import batch_conversion
+import google_document_ai
 
 #Install tkdnd2.8 in \tcl of Python install. https://sourceforge.net/projects/tkdnd/
 #Install TkinterDnD2 in the \Lib\site-packages of Python install. https://sourceforge.net/projects/tkinterdnd/
@@ -17,21 +18,26 @@ def show_selection():
 
 #Converts files and displays pop-up message when complete.
 def convert():
+	print(list_box.get(0, 'end'))
 	batch_conversion.main(list_box.get(0, 'end'))
 	#pop_up("Files successfully converted!")
 	ocr_page()
 
-def ocr():
+def ocr(file_location):
 	print("OCR happens here")
+	document = google_document_ai.DocumentAI()
+	for file in file_location:
+		document.convertFile(file, "txt")
 
 #Creates OCR page.
 def ocr_page():
 	#Destroys drag and drop page.
+	file_location = [list_box.get(0, last=None)]
 	list_box.destroy()
 	convert_button.destroy()
 	#Creates new OCR page.
 	window.title("OCR processing")
-	ocr_button = tk.Button(window, text= "Perform OCR", command = ocr, background = "#3c78d8")
+	ocr_button = tk.Button(window, text= "Perform OCR", command = lambda: ocr(file_location), background = "#3c78d8")
 	ocr_button.place(x=375, y=500)
 
 # Creates pop up window to confirm the files were successfully converted.
@@ -47,7 +53,7 @@ def pop_up(message):
 	confirmButton.pack()
 	popUpWindow.mainloop()
 
-variable = StringValue()
+#variable = StringValue()
 #Create Tkinter window.
 window = TkinterDnD.Tk()
 window.configure(bg = "#d9d9d9")
