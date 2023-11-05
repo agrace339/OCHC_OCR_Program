@@ -17,26 +17,21 @@ import os
 # It should be all set!
 
 class DocumentAI:
-    PROJECT_ID = "ochc-ocr" #project name on Cloud Console
-    LOCATION = "us"  # Format is 'us' or 'eu'
-    PROCESSOR_ID = "3cb371dd084861ed"  # Create processor in Cloud Console, can be changed to test other processors
-    RESOURCE_NAME = ""
-    DOCAI_CLIENT = ""
 
-    def __init__(self):
-            DOCAI_CLIENT = documentai.DocumentProcessorServiceClient(
-                client_options=ClientOptions(api_endpoint=f"{LOCATION}-documentai.googleapis.com")
-            )
-            RESOURCE_NAME = DOCAI_CLIENT.processor_path(PROJECT_ID, LOCATION, PROCESSOR_ID)
-            # Instantiates a client (Connect to API)
+    def __init__(self, PROJECT_ID = "ochc-ocr", LOCATION = "us", PROCESSOR_ID = "3cb371dd084861ed", RESOURCE_NAME = ""):
+        self.docaiclient = documentai.DocumentProcessorServiceClient(
+            client_options=ClientOptions(api_endpoint=f"{LOCATION}-documentai.googleapis.com")
+        )
+        RESOURCE_NAME = self.docaiclient.processor_path(PROJECT_ID, LOCATION, PROCESSOR_ID)
+        # Instantiates a client (Connect to API)
             
 
-    def convertBatch(file_path, output_type, batch_size = 50):
+    def convertBatch(self, file_path, output_type, batch_size = 50):
         # Get list of files from path
         dir_list = os.listdir(file_path)
         __createBatch()
 
-    def convertFile(file_path, output_type):
+    def convertFile(self, file_path, output_type):
         dir_list = os.listdir(file_path)
         # Refer to https://cloud.google.com/document-ai/docs/file-types for supported file types
         # Reads from ./files path and identifies files that can be transcribed
@@ -48,7 +43,7 @@ class DocumentAI:
             elif ".pdf" in dir_list[i].lower():
                 __makeTextFile(dir_list[i],"./files/"+dir_list[i], "application/pdf", output_type)
 
-    def __makeTextFile(file_name, file_path, mime_type):
+    def __makeTextFile(self, file_name, file_path, mime_type):
         # Read the file into memory
         with open(file_path, "rb") as image:
             image_content = image.read()
@@ -60,7 +55,7 @@ class DocumentAI:
         request = documentai.ProcessRequest(name=RESOURCE_NAME, raw_document=raw_document)
 
         # Use the Document AI client to process the sample form
-        result = DOCAI_CLIENT.process_document(request=request)
+        result = self.docaiclient.process_document(request=request)
 
         document_object = result.document
         print("Document processing complete.")
@@ -70,20 +65,20 @@ class DocumentAI:
         with open(output_name, "w") as text_file:
                 text_file.write(document_object.text)
 
-    def __createBatch(gcs_bucket_name, file_path, batch_size = 50):
+    def __createBatch(self, gcs_bucket_name, file_path, batch_size = 50):
     # Creating batches of documents for processing
-    batches = gcs_utilities.create_batches(
-        gcs_bucket_name=gcs_bucket_name, gcs_prefix=gcs_prefix, batch_size=batch_size
-    )
-
-    print(f"{len(batches)} batch(es) created.")
-    for batch in batches:
-        print(f"{len(batch.gcs_documents.documents)} files in batch.")
-        print(batch.gcs_documents.documents)
-
-        # Use as input for batch_process_documents()
-        # Refer to https://cloud.google.com/document-ai/docs/send-request
-        # for how to send a batch processing request
-        request = documentai.BatchProcessRequest(
-            name="processor_name", input_documents=batch
+        batches = gcs_utilities.create_batches(
+            gcs_bucket_name=gcs_bucket_name, gcs_prefix=gcs_prefix, batch_size=batch_size
         )
+
+        print(f"{len(batches)} batch(es) created.")
+        for batch in batches:
+            print(f"{len(batch.gcs_documents.documents)} files in batch.")
+            print(batch.gcs_documents.documents)
+
+            # Use as input for batch_process_documents()
+            # Refer to https://cloud.google.com/document-ai/docs/send-request
+            # for how to send a batch processing request
+            request = documentai.BatchProcessRequest(
+                name="processor_name", input_documents=batch
+            )
