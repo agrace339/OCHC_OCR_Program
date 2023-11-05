@@ -27,7 +27,7 @@ def ocr(file_location):
 	print("OCR happens here")
 	document = google_document_ai.DocumentAI()
 	for file in file_location:
-		document.convertFile(file, "txt")
+		document.convertFile(file, ".txt")
 
 #Creates OCR page.
 def ocr_page():
