@@ -11,6 +11,7 @@ from google.api_core.exceptions import RetryError
 from google.cloud import documentai
 from google.cloud import storage
 
+#Class to access all Google Document AI-related functions.
 class DocumentAI:
     global PROJECT_ID
     global LOCATION
@@ -36,6 +37,7 @@ class DocumentAI:
         RESOURCE_NAME = DOCAI_CLIENT.processor_path(PROJECT_ID, LOCATION, PROCESSOR_ID)
         # Instantiates a client (Connect to API)
 
+    # Batch file transcription using GCS bucket.
     def transcribeBatch(self, file_path, output_type):
         gcs_output_uri = "gs://bucket/output_batch_files"
         gcs_input_prefix = "gs://bucket/input_batch_files"
@@ -48,12 +50,13 @@ class DocumentAI:
         # Performs OCR on files
         self.__batchProcessFiles(gcs_output_uri, gcs_input_prefix = gcs_input_prefix)
 
-     #transcribes a folder of files
+    # Transcribes all files within a folder.
     def transcribeFolder(self, folder_path, output_type):
         dir_list = os.listdir(folder_path)
         for i in range(len(dir_list)):
             self.transcribeFile(folder_path + "/" + dir_list[i], output_type)
-        
+    
+    #Transcribes individual PDF file.
     def transcribeFile(self, file_path, output_type):
         name = file_path.split("/")[-1]
         # Refer to https://cloud.google.com/document-ai/docs/file-types for supported file types
@@ -71,6 +74,7 @@ class DocumentAI:
             return
         self.__makeTextFile(name, file_path, mime_type, output_type)
 
+    # Creates text file of transcribed file.
     def __makeTextFile(self, file_name, file_path, mime_type, output_type):
         global PROJECT_ID
         global LOCATION
