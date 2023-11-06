@@ -35,22 +35,30 @@ def add_file():
 #						MAIN BUTTON ACTION FUNCTIONS
 #______________________________________________________________________________________
 
-# Batch converts files from list box, then goes to OCR UI page.
+# Batch converts files from list box to PDFs, then displays OCR UI page.
 def convert():
+	#If no files in list box, create pop-up error window.
 	if not list_box.get(0, list_box.size()):
 		pop_up("No files given.")
+	#Otherwise, batch convert all inputted files to pdfs, then display next page.
 	else:
 		batch_conversion.main(list_box.get(0, 'end'))
 		ocr_page()
 
-#Commits the OCR based on given file location
+#Transcribes all documents inputted into drag and drop list box.
 def ocr(file_location):
 	document = google_document_ai.DocumentAI()
+
+	# Goes through each file dropped in the listbox and converts each one.
 	for file in file_location:
+		#If the current element is a file, transcribe just that file.
 		if os.path.isfile(file):
 			document.transcribeFile(file, ".txt")
+		#If the current element is a folder, transcribe all files we can within folder.
 		if os.path.isdir(file):
 			document.transcribeFolder(file, ".txt")
+
+	#Creates pop-up window when transcription process is complete.
 	pop_up("Document processing complete!")
 
 #______________________________________________________________________________________
@@ -66,27 +74,33 @@ def ocr_page():
 	convert_button.destroy()
 	delete_button.destroy()
 	add_file_button.destroy()
+
 	#Creates new OCR page.
-	#Creates text.
+	#Creates OCR text prompt.
 	ocr_prompt = tk.Text(window, font = ('Arial', 22), background = "light gray", width = 53, height = 3, highlightbackground= "light gray")
 	ocr_prompt.place(x=75, y=200)
 	ocr_prompt.tag_configure("center", justify='center')
 	ocr_prompt.insert('1.0', "Step 2:\nFile(s) have been converted to PDFs.\nPerform transcription?")
 	ocr_prompt.tag_add("center", "1.0", "end")
 	ocr_prompt.config(state='disabled')
+
+	#When OCR button is pressed, transcribes all files inputted into drag and drop
 	ocr_button = Button(window, text= "Yes", command = lambda: ocr(file_location), background = "dodger blue", font=('Arial', 30), borderless = 1)
 	ocr_button.place(x=350, y=300)
 
-# Creates pop up window to confirm the files were successfully converted.
+# Creates pop-up window with a displayed message.
 def pop_up(message):
 	#Creates small pop-up window.
 	popUpWindow = TkinterDnD.Tk()
 	popUpWindow.configure(bg = "light gray")
 	popUpWindow.geometry("300x100")
 	popUpWindow.title("OCHC File Transcription")
+
+	#Displays inputted message.
 	textMessage = tk.Label(popUpWindow, text=message, background = "light gray", font = ('Arial', 18))
 	textMessage.pack(side="top", fill="x", pady=10)
-	#Creates button to exit the pop-up window.
+
+	#Creates confirm button to exit the pop-up window.
 	confirmButton = Button(popUpWindow, text= "Confirm", command = popUpWindow.destroy, bg = "dodger blue", font=('Arial', 30), borderless = 1)
 	confirmButton.pack()
 	popUpWindow.mainloop()
@@ -100,7 +114,7 @@ window.geometry("800x600")
 window.title("OCHC File Transcription")
 window.resizable(False,False)
 
-#Creates text.
+#Creates prompt text for drag and drop page.
 dnd_prompt = tk.Text(window, font = ('Arial', 22), background = "light gray", width = 53, height = 3, highlightbackground= "light gray")
 dnd_prompt.place(x=50, y=25)
 dnd_prompt.tag_configure("center", justify='center')
