@@ -2,6 +2,8 @@ import tkinter as tk
 from TkinterDnD2 import DND_FILES, TkinterDnD
 import batch_conversion
 import google_document_ai
+from tkinter import filedialog
+import os
 
 #Install tkdnd2.8 in \tcl of Python install. https://sourceforge.net/projects/tkdnd/
 #Install TkinterDnD2 in the \Lib\site-packages of Python install. https://sourceforge.net/projects/tkinterdnd/
@@ -23,6 +25,13 @@ def delete_selection():
 	selection = list_box.curselection()
 	for s in selection[::-1]: 
 		list_box.delete(selection) 
+
+#Opens file explorer window to add files to listbox
+def add_file():
+    folder_path = filedialog.askdirectory()  #Open a folder selection dialog
+    if folder_path:
+        for item in os.listdir(folder_path):
+            list_box.insert(tk.END, item)  #Insert folder contents into Listbox
 
 #Commits the OCR based on given file location
 def ocr(file_location):
@@ -75,5 +84,9 @@ convert_button.place(x=400, y=500)
 #If delete button is pressed, remove selection from the listbox.
 delete_button = tk.Button(window, text="Delete Selection(s)", command = delete_selection, background = "#3c78d8")
 delete_button.place(x=600, y=500)
+
+#If add file button is pressed, opens file explorer window to add files to listbox.
+add_file_button = tk.Button(window, text="Add file(s)", command = add_file, background = "#3c78d8")
+add_file_button.place(x=550, y=500)
 
 window.mainloop()
