@@ -48,17 +48,26 @@ class DocumentAI:
         # Performs OCR on files
         self.__batchProcessFiles(gcs_output_uri, gcs_input_prefix = gcs_input_prefix)
 
-    def transcribeFile(self, file_path, output_type):
+        #transcibes a folder of files
+    def transcibeFolder(self, folder_path, output_type):
         dir_list = os.listdir(file_path)
+        for i in range(len(dir_list)):
+            self.transcibeFile(folder_path + "/" + dir_list[i], output_type)
+        
+    def transcribeFile(self, file_path, output_type):
+        name = file_path.split[-1]
         # Refer to https://cloud.google.com/document-ai/docs/file-types for supported file types
         # Reads from ./files path and identifies files that can be transcribed
-        for i in range(len(dir_list)):
-            if ".jpg" in dir_list[i].lower():
-                self.__makeTextFile(dir_list[i], file_path + "/" + dir_list[i], "image/jpeg", output_type)
-            elif ".tif" in dir_list[i].lower():
-                self.__makeTextFile(dir_list[i], file_path + "/" + dir_list[i], "image/tiff", output_type)
-            elif ".pdf" in dir_list[i].lower():
-                self.__makeTextFile(dir_list[i], file_path + "/" + dir_list[i], "application/pdf", output_type)
+        if ".jpg" in name.lower():
+            mime_type = "image/jpeg"
+        elif ".tif" in name.lower():
+            mime_type = "image/tiff"
+        elif ".pdf" in name.lower():
+            mime_type = "application/pdf"
+        else:
+            print("Unsupport file type")
+            return
+        self.__makeTextFile(name, file_path, mime_type, output_type)
 
     def __makeTextFile(self, file_name, file_path, mime_type, output_type):
         global PROJECT_ID
