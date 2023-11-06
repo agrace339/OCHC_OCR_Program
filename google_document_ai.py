@@ -55,7 +55,7 @@ class DocumentAI:
             self.transcibeFile(folder_path + "/" + dir_list[i], output_type)
         
     def transcribeFile(self, file_path, output_type):
-        name = file_path.split[-1]
+        name = file_path.split("/")[-1]
         # Refer to https://cloud.google.com/document-ai/docs/file-types for supported file types
         # Reads from ./files path and identifies files that can be transcribed
         if ".jpg" in name.lower():
