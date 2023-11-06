@@ -50,7 +50,7 @@ class DocumentAI:
 
         #transcibes a folder of files
     def transcibeFolder(self, folder_path, output_type):
-        dir_list = os.listdir(file_path)
+        dir_list = os.listdir(folder_path)
         for i in range(len(dir_list)):
             self.transcibeFile(folder_path + "/" + dir_list[i], output_type)
         
