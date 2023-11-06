@@ -65,7 +65,7 @@ class DocumentAI:
         elif ".pdf" in name.lower():
             mime_type = "application/pdf"
         else:
-            print("Unsupport file type")
+            print("Unsupported file type")
             return
         self.__makeTextFile(name, file_path, mime_type, output_type)
 
