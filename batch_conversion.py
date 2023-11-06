@@ -19,7 +19,7 @@ def file_to_pdf(file):
 def folder_to_pdf(folder_name):
 #Convert all JPEG files in a folder into one multi-page pdf file.
 	#Get current working directory.
-	img_dir = os.getcwd() + folder_name
+	img_dir = folder_name
 
 	#CITE: https://github.com/josch/img2pdf
 	#DESC: Open source code from IMG2PDF github
