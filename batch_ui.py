@@ -12,26 +12,20 @@ import google_document_ai
 def drop_in(event):
 	list_box.insert("end", event.data)	
 
-# When an item from the listbox is clicked on, the selection is highlighted and stored.
-def show_selection():
-	selection = list_box.get(list_box.curselection())
-	variable.set(selection)
-
 #Converts files and displays pop-up message when complete.
 def convert():
-	print(list_box.get(0, 'end'))
 	batch_conversion.main(list_box.get(0, 'end'))
 	#pop_up("Files successfully converted!")
 	ocr_page()
 
 #Deletes selection from button press
 def delete_selection():
-	for selection in selection[::-1]: 
-        list_box.delete(selection) 
+	selection = list_box.curselection()
+	for s in selection[::-1]: 
+		list_box.delete(selection) 
 
 #Commits the OCR based on given file location
 def ocr(file_location):
-	print("OCR happens here")
 	document = google_document_ai.DocumentAI()
 	for file in file_location:
 		document.convertFile(file, ".txt")
@@ -80,6 +74,6 @@ convert_button.place(x=400, y=500)
 
 #If delete button is pressed, remove selection from the listbox.
 delete_button = tk.Button(window, text="Delete Selection(s)", command = delete_selection, background = "#3c78d8")
-convert_button.place(x=400, y=600)
+delete_button.place(x=600, y=500)
 
 window.mainloop()
