@@ -1,144 +1,66 @@
-import tkinter as tk
-from TkinterDnD2 import DND_FILES, TkinterDnD
-import batch_conversion
-import google_document_ai
-from tkinter import filedialog
-from tkmacosx import Button
+import sys
 import os
-import os.path
+import img2pdf
+import re
 
-#Install tkdnd2.8 in \tcl of Python install. https://sourceforge.net/projects/tkdnd/
-#Install TkinterDnD2 in the \Lib\site-packages of Python install. https://sourceforge.net/projects/tkinterdnd/
+#Install img2pdf by typing command "pip3 install img2pdf" in terminal
 
-#Drag and drop information and code provided by https://stackoverflow.com/questions/25427347/how-to-install-and-use-tkdnd-with-python-tkinter-on-osx/46856247#46856247
+def file_to_pdf(file):
+#Converts single JPEG file to a PDF.
+	#CITE: https://github.com/josch/img2pdf
+	#DESC: Open source code from IMG2PDF github
+	#Open input file and convert to pdf.
+	match = re.search(r"(\w)+.(jpg|tif)", file)
+	if match:
+		title = (match.group())[0:-4] + ".pdf"
+	with open(title,"wb") as f:
+		f.write(img2pdf.convert(file))
 
-#______________________________________________________________________________________
-#							LIST BOX HANDLING METHODS
-#______________________________________________________________________________________
+def folder_to_pdf(folder_name):
+#Convert all JPEG files in a folder into one multi-page pdf file.
+	#Get current working directory.
+	img_dir = folder_name
 
-# When a file is dragged into the box, the file path is dropped into the list box.
-def drop_in(event):
-	list_box.insert("end", event.data)	
+	#CITE: https://github.com/josch/img2pdf
+	#DESC: Open source code from IMG2PDF github
+	#Find all images within the directory.
+	imgs = []
+	for r, _, f in os.walk(img_dir):
+		for fname in f:
+			if not fname.endswith(".jpg") and not fname.endswith(".tif"):
+				continue
+			imgs.append(os.path.join(r, fname))
+	#Converts all images in directory to pdfs.
+	with open("name.pdf","wb") as f:
+		f.write(img2pdf.convert(imgs))
 
-# Deletes selection from button press.
-def delete_selection():
-	selection = list_box.curselection()
-	for s in selection[::-1]: 
-		list_box.delete(selection) 
+def convert(file):
 
-#Opens file explorer window to add files to listbox
-def add_file():
-	folder_path = filedialog.askdirectory()  #Open a folder selection dialog
-	list_box.insert(tk.END, folder_path)
+	#Regular expressions to determine if input element is file or folder.
+	in_file = re.match(r"[/a-zA-Z0-9]+.(jpg|tif)", file)
+	in_folder = re.match(r"/[a-zA-Z0-9]+", file)
 
-#______________________________________________________________________________________
-#						MAIN BUTTON ACTION FUNCTIONS
-#______________________________________________________________________________________
-
-# Batch converts files from list box to PDFs, then displays OCR UI page.
-def convert():
-	#If no files in list box, create pop-up error window.
-	if not list_box.get(0, list_box.size()):
-		pop_up("No files given.")
-	#Otherwise, batch convert all inputted files to pdfs, then display next page.
+	#If single file given, convert just that file to a pdf.
+	if in_file:
+		file_to_pdf(file)
+	#If folder is given, convert all image files to pdfs in folder.
+	elif in_folder:
+		folder_to_pdf(file)
+	#If argument is invalid, raise exception.
 	else:
-		batch_conversion.main(list_box.get(0, 'end'))
-		ocr_page()
+		raise Exception("Not valid file or folder name.")
 
-#Transcribes all documents inputted into drag and drop list box.
-def ocr(file_location):
-	document = google_document_ai.DocumentAI()
+def main(files):
+	#If no JPEG or TIFF file given, raise error.
+	if not files:
+		raise Exception("No file given.")
+	
+	#Convert all files from list.
+	files_completed = 0
+	for file in files:
+		convert(file)
+		files_completed += 1
 
-	# Goes through each file dropped in the listbox and converts each one.
-	for file in file_location:
-		#If the current element is a file, transcribe just that file.
-		if os.path.isfile(file):
-			document.transcribeFile(file, ".txt")
-		#If the current element is a folder, transcribe all files we can within folder.
-		if os.path.isdir(file):
-			document.transcribeFolder(file, ".txt")
 
-	#Creates pop-up window when transcription process is complete.
-	pop_up("Document processing complete!")
-
-#______________________________________________________________________________________
-#							NEW WINDOW CREATION FUNCTIONS
-#______________________________________________________________________________________
-
-#Creates processing page.
-def ocr_page():
-	#Destroys drag and drop page.
-	file_location = list_box.get(0, list_box.size())
-	dnd_prompt.destroy()
-	list_box.destroy()
-	convert_button.destroy()
-	delete_button.destroy()
-	add_file_button.destroy()
-
-	#Creates new OCR page.
-	#Creates OCR text prompt.
-	ocr_prompt = tk.Text(window, font = ('Arial', 22), background = "light gray", width = 53, height = 3, highlightbackground= "light gray")
-	ocr_prompt.place(x=75, y=200)
-	ocr_prompt.tag_configure("center", justify='center')
-	ocr_prompt.insert('1.0', "Step 2:\nFile(s) have been converted to PDFs.\nPerform transcription?")
-	ocr_prompt.tag_add("center", "1.0", "end")
-	ocr_prompt.config(state='disabled')
-
-	#When OCR button is pressed, transcribes all files inputted into drag and drop
-	ocr_button = Button(window, text= "Yes", command = lambda: ocr(file_location), background = "dodger blue", font=('Arial', 30), borderless = 1)
-	ocr_button.place(x=350, y=300)
-
-# Creates pop-up window with a displayed message.
-def pop_up(message):
-	#Creates small pop-up window.
-	popUpWindow = TkinterDnD.Tk()
-	popUpWindow.configure(bg = "light gray")
-	popUpWindow.geometry("300x100")
-	popUpWindow.title("OCHC File Transcription")
-
-	#Displays inputted message.
-	textMessage = tk.Label(popUpWindow, text=message, background = "light gray", font = ('Arial', 18))
-	textMessage.pack(side="top", fill="x", pady=10)
-
-	#Creates confirm button to exit the pop-up window.
-	confirmButton = Button(popUpWindow, text= "Confirm", command = popUpWindow.destroy, bg = "dodger blue", font=('Arial', 30), borderless = 1)
-	confirmButton.pack()
-	popUpWindow.mainloop()
-
-#______________________________________________________________________________________ 
-
-#Create Tkinter window.
-window = TkinterDnD.Tk()
-window.configure(bg = "light gray")
-window.geometry("800x600")
-window.title("OCHC File Transcription")
-window.resizable(False,False)
-
-#Creates prompt text for drag and drop page.
-dnd_prompt = tk.Text(window, font = ('Arial', 22), background = "light gray", width = 53, height = 3, highlightbackground= "light gray")
-dnd_prompt.place(x=50, y=25)
-dnd_prompt.tag_configure("center", justify='center')
-dnd_prompt.insert('1.0', "Step 1:\nDrag and drop files in box below,\nthen convert to PDF with Convert Button below.")
-dnd_prompt.tag_add("center", "1.0", "end")
-dnd_prompt.config(state='disabled')
-
-#Creates drag and drop list box.
-list_box = tk.Listbox(window, selectmode=tk.SINGLE, background="#999999", highlightthickness = 2, highlightbackground= "gray25", highlightcolor= "gray25", width = 63, height = 15, font = ('Arial', 18))
-list_box.place(x= 50, y= 120)
-list_box.drop_target_register(DND_FILES)
-list_box.dnd_bind("<<Drop>>", drop_in)
-file_location = [list_box.get(0, last=None)]
-
-#If convert button is pressed, get contents of listbox and convert.
-convert_button = Button(window, text= "Convert Files", command = convert, bg = "dodger blue", font=('Arial', 30), borderless = 1)
-convert_button.place(x=275, y=500)
-
-#If delete button is pressed, remove selection from the listbox.
-delete_button = Button(window, text="Delete Selection(s)", command = delete_selection, background = "dodger blue", font=('Arial', 20), borderless = 1)
-delete_button.place(x=550, y=500)
-
-#If add file button is pressed, opens file explorer window to add files to listbox.
-add_file_button = Button(window, text="Add File(s)", command = add_file, background = "dodger blue", font=('Arial', 20), borderless = 1)
-add_file_button.place(x=50, y=500)
-
-window.mainloop()
+if __name__ == '__main__':
+	main()
