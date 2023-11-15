@@ -56,8 +56,11 @@ def main(files):
 		raise Exception("No file given.")
 	
 	#Convert all files from list.
+	files_completed = 0
 	for file in files:
 		convert(file)
+		files_completed += 1
+
 
 if __name__ == '__main__':
 	main()
