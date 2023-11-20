@@ -24,7 +24,7 @@ Go to https://cloud.google.com/sdk/docs/install to install Google Cloud SDK.
 <br>Extract archive and run ```./google-cloud-sdk/install.sh``` and reply no, yes, no to the prompts.
 <br>Then run ```./google-cloud-sdk/bin/gcloud init```, log into account and select the correct project.
 <br>If gcloud command is not found after running this command, run ```source ~/.bashrc```
-<br>Then run gcloud auth application-default login
+<br>Then run ```gcloud auth application-default login```
 <br>Commands may need to be run multiple times
 <br>It should be all set!
 
