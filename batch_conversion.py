@@ -3,6 +3,8 @@ import os
 import img2pdf
 import re
 
+cancelled = False
+
 #Install img2pdf by typing command "pip3 install img2pdf" in terminal
 
 def file_to_pdf(file):
@@ -10,6 +12,9 @@ def file_to_pdf(file):
 	#CITE: https://github.com/josch/img2pdf
 	#DESC: Open source code from IMG2PDF github
 	#Open input file and convert to pdf.
+	global cancelled
+	if cancelled:
+		return
 	match = re.search(r"(\w)+.(jpg|tif)", file)
 	if match:
 		title = (match.group())[0:-4] + ".pdf"
@@ -24,6 +29,9 @@ def folder_to_pdf(folder_name):
 	#CITE: https://github.com/josch/img2pdf
 	#DESC: Open source code from IMG2PDF github
 	#Find all images within the directory.
+	global cancelled
+	if cancelled:
+		return
 	imgs = []
 	for r, _, f in os.walk(img_dir):
 		for fname in f:
@@ -36,6 +44,10 @@ def folder_to_pdf(folder_name):
 
 def convert(file):
 
+	#Check if cancelled is set True.
+	global cancelled
+	if cancelled:
+		return
 	#Regular expressions to determine if input element is file or folder.
 	in_file = re.match(r"[/a-zA-Z0-9]+.(jpg|tif)", file)
 	in_folder = re.match(r"/[a-zA-Z0-9]+", file)
@@ -50,7 +62,14 @@ def convert(file):
 	else:
 		raise Exception("Not valid file or folder name.")
 
+def set_cancelled():
+    #Function to set the 'cancelled' variable
+    cancelled = True
+
 def main(files):
+	global cancelled
+	if cancelled:
+		return
 	#If no JPEG or TIFF file given, raise error.
 	if not files:
 		raise Exception("No file given.")
