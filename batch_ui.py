@@ -1,4 +1,3 @@
-from importlib.metadata import files
 import tkinter as tk
 from tkinter import ttk
 from TkinterDnD2 import DND_FILES, TkinterDnD
@@ -45,6 +44,9 @@ def convert():
 	#Otherwise, batch convert all inputted files to pdfs, then display next page.
 	else:
 		batch_conversion.main(list_box.get(0, 'end'))
+		convert_page()
+		if batch_conversion.cancelled == True:
+			return
 		ocr_page()
 
 #Transcribes all documents inputted into drag and drop list box.
@@ -67,6 +69,28 @@ def ocr(file_location):
 #							NEW WINDOW CREATION FUNCTIONS
 #______________________________________________________________________________________
 
+#Creates converting page.
+def convert_page():
+	#Destroys drag and drop page.
+	dnd_prompt.destroy()
+	list_box.destroy()
+	convert_button.destroy()
+	delete_button.destroy()
+	add_file_button.destroy()
+
+	#Creates new Convert page.
+	#Creates Convert text prompt.
+	convert_progress = tk.Text(window, font = ('Arial', 22), background = "light gray", width = 53, height = 3, highlightbackground= "light gray")
+	convert_progress.place(x=75, y=200)
+	convert_progress.tag_configure("center", justify='center')
+	convert_progress.insert('1.0', "Step 2:\nFile(s) are currently converting into pdfs...")
+	convert_progress.tag_add("center", "1.0", "end")
+	convert_progress.config(state='disabled')
+
+	#When cancel button is pressed, returns back to drag and drop page.
+	cancel_button = Button(window, text= "Cancel", command = lambda: batch_conversion.cancelled(), background = "dodger blue", font=('Arial', 30), borderless = 1)
+	cancel_button.place(x=350, y=300)
+
 #Creates processing page.
 def ocr_page():
 	#Destroys drag and drop page.
@@ -82,13 +106,13 @@ def ocr_page():
 	ocr_prompt = tk.Text(window, font = ('Arial', 22), background = "light gray", width = 53, height = 3, highlightbackground= "light gray")
 	ocr_prompt.place(x=75, y=200)
 	ocr_prompt.tag_configure("center", justify='center')
-	progress_bar = ttk.Progressbar(maximum=100)
-	progress_bar.place(x=75, y=200, width=100)
-	files_completed = batch_conversion.main(files_completed)
-	files = batch_conversion.main(files)
-	for file in files:
-		file_percentage = (int((files_completed / files))) * 100
-		progress_bar.set(file_percentage)
+	# progress_bar = ttk.Progressbar(maximum=100)
+	# progress_bar.place(x=75, y=200, width=100)
+	# files_completed = batch_conversion.main(files_completed)
+	# files = batch_conversion.main(files)
+	# for file in files:
+	# 	file_percentage = (int((files_completed / files))) * 100
+	# 	progress_bar.set(file_percentage)
 
 	ocr_prompt.insert('1.0', "Step 2:\nFile(s) have been converted to PDFs.\nPerform transcription?")
 	ocr_prompt.tag_add("center", "1.0", "end")
