@@ -47,6 +47,8 @@ def convert():
 		convert_page()
 		if batch_conversion.cancelled == True:
 			return
+		convert_progress.destroy()
+		cancel_button.destroy()
 		ocr_page()
 
 #Transcribes all documents inputted into drag and drop list box.
