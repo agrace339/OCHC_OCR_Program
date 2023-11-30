@@ -2,14 +2,12 @@ import os
 import re
 from typing import Optional
 from venv import create
-from google.cloud import storage
+from fpdf import FPDF
+from unidecode import unidecode
 from google.api_core.client_options import ClientOptions
 from google.cloud.documentai_toolbox import gcs_utilities
-from google.api_core.client_options import ClientOptions
-from google.api_core.exceptions import InternalServerError
-from google.api_core.exceptions import RetryError
-from google.cloud import documentai
-from google.cloud import storage
+from google.api_core.exceptions import InternalServerError, RetryError
+from google.cloud import documentai,storage
 
 # Class to access all Google Document AI-related functions.
 class DocumentAI:
@@ -39,16 +37,16 @@ class DocumentAI:
 
     # Batch file transcription using GCS bucket.
     def transcribeBatch(self, file_path, output_type):
-        gcs_output_uri = "gs://bucket/output_batch_files"
-        gcs_input_prefix = "gs://bucket/input_batch_files"
+        gcs_output_uri = "gs://output_batch_files"
+        gcs_input_prefix = "gs://input_batch_files"
 
         # Uploads all the files to a GCS Bucket
         dir_list = os.listdir(file_path)
         for file_name in dir_list:
-            self.__uploadFiles("input_batch_files", file_name, file_name.split(".")[0])
+            self.__uploadFiles("input_batch_files", file_path + "/" + file_name, file_name.split(".")[0])
 
         # Performs OCR on files
-        self.__batchProcessFiles(gcs_output_uri, gcs_input_prefix = gcs_input_prefix)
+        self.__batchProcessFiles(output_type, gcs_output_uri, gcs_input_prefix = gcs_input_prefix)
 
     # Transcribes all files within a folder.
     def transcribeFolder(self, folder_path, output_type):
@@ -73,6 +71,18 @@ class DocumentAI:
             print("Unsupported file type")
             return
         self.__makeTextFile(name, file_path, mime_type, output_type)
+
+    def __outputFile(self, file_name, text, output_type):
+        if output_type == ".txt":
+            with open(file_name, "w") as text_file:
+                text_file.write(text)
+        elif output_type == ".pdf":
+            pdf = FPDF()
+            pdf.add_page()
+            pdf.set_font("Arial", size=12)
+            for line in text.splitlines():
+                pdf.multi_cell(200, 10, txt = unidecode(line), align = 'L')
+            pdf.output(file_name + ".pdf")
 
     # Creates text file of transcribed file.
     def __makeTextFile(self, file_name, file_path, mime_type, output_type):
@@ -101,10 +111,9 @@ class DocumentAI:
         document_object = result.document
         print("Document processing complete.")
 
-        # Create .txt file with transcribed text
-        output_name = "txt_files_" + file_name.split(".")[0] + output_type
-        with open(output_name, "w") as text_file:
-            text_file.write(document_object.text)
+        # Save text as document
+        output_name = file_name.split(".")[0]
+        self.__outputFile(output_name, document_object.text, output_type)
 
     # Uploads files to GCS Bucket
     def __uploadFiles(self, bucket_name, source_file_name, destination_blob_name):
@@ -120,17 +129,20 @@ class DocumentAI:
         # If the destination object already exists in your bucket, set instead a
         # generation-match precondition using its generation number.
         generation_match_precondition = 0
+        if not blob.exists():
+            # Uploads file to bucket
+            blob.upload_from_filename(
+                source_file_name, if_generation_match=generation_match_precondition
+            )
 
-        # Uploads file to bucket
-        blob.upload_from_filename(
-            source_file_name, if_generation_match=generation_match_precondition
-        )
-
-        print(f"File {source_file_name} uploaded to {destination_blob_name}.")
+            print(f"File {destination_blob_name} uploaded to {bucket_name}.")
+        else:
+            print(f"File {destination_blob_name} already exists in {bucket_name}.")
 
     # Performs batch transcription on a specificied GCS bucket
     def __batchProcessFiles(
         self,
+        output_type,
         gcs_output_uri: str,
         processor_version_id: Optional[str] = None,
         gcs_input_uri: Optional[str] = None,
@@ -234,6 +246,6 @@ class DocumentAI:
                 # For a full list of Document object attributes, please reference this page:
                 # https://cloud.google.com/python/docs/reference/documentai/latest/google.cloud.documentai_v1.types.Document
 
-                # Read the text recognition output from the processor
-                print("The document contains the following text:")
-                print(document.text)
+                # Save text as document
+                file_name = blob.name.split("/")[-1].split(".")[0]
+                self.__outputFile(file_name, document.text, output_type)
