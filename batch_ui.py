@@ -46,6 +46,7 @@ def convert():
 		batch_conversion.main(list_box.get(0, 'end'))
 		convert_page()
 		if batch_conversion.cancelled == True:
+			batch_conversion.cancelled = False
 			return
 		convert_progress.destroy()
 		cancel_button.destroy()
