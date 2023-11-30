@@ -69,7 +69,7 @@ def set_cancelled():
 def main(files):
 	global cancelled
 	if cancelled:
-		return
+		raise Exception("Process cancelled.")
 	#If no JPEG or TIFF file given, raise error.
 	if not files:
 		raise Exception("No file given.")
