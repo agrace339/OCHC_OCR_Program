@@ -50,13 +50,13 @@ def convert():
 			box_file = box_file.replace("}", "")
 			files_list.append(box_file)
 		convert_progress, cancel_button = convert_page()
-		batch_conversion.main(files_list)
+		pdf_locs = batch_conversion.main(files_list)
 		if batch_conversion.cancelled == True:
 			batch_conversion.cancelled = False
 			dnd_page(box_files)
 		convert_progress.destroy()
 		cancel_button.destroy()
-		ocr_page(files_list)
+		ocr_page(pdf_locs)
 
 #Transcribes all documents inputted into drag and drop list box.
 def ocr(file_location):
@@ -66,10 +66,10 @@ def ocr(file_location):
 	for file in file_location:
 		#If the current element is a file, transcribe just that file.
 		if os.path.isfile(file):
-			document.transcribeFile(file, ".txt")
+			document.transcribeFile(file, ".pdf")
 		#If the current element is a folder, transcribe all files we can within folder.
 		if os.path.isdir(file):
-			document.transcribeFolder(file, ".txt")
+			document.transcribeFolder(file, ".pdf")
 
 	#Creates pop-up window when transcription process is complete.
 	pop_up("Document processing complete!")
@@ -94,8 +94,8 @@ def dnd_page(box_files = None):
 	list_box.dnd_bind("<<Drop>>", drop_in)
 	file_location = [list_box.get(0, last=None)]
 
-	if box_files:
-		print("hi!")
+	#if box_files:
+	#	print("hi!")
 
 	#If convert button is pressed, get contents of listbox and convert.
 	convert_button = Button(window, text= "Convert Files", command = convert, bg = "dodger blue", font=('Arial', 30), borderless = 1)
