@@ -43,14 +43,20 @@ def convert():
 		pop_up("No files given.")
 	#Otherwise, batch convert all inputted files to pdfs, then display next page.
 	else:
-		batch_conversion.main(list_box.get(0, 'end'))
-		convert_page()
+		files_list = []
+		box_files = list_box.get(0, 'end')
+		for i in range(len(box_files)):
+			box_file = box_files[i].replace("{", "")
+			box_file = box_file.replace("}", "")
+			files_list.append(box_file)
+		convert_progress, cancel_button = convert_page()
+		batch_conversion.main(files_list)
 		if batch_conversion.cancelled == True:
 			batch_conversion.cancelled = False
-			return
+			dnd_page(box_files)
 		convert_progress.destroy()
 		cancel_button.destroy()
-		ocr_page()
+		ocr_page(files_list)
 
 #Transcribes all documents inputted into drag and drop list box.
 def ocr(file_location):
@@ -72,6 +78,39 @@ def ocr(file_location):
 #							NEW WINDOW CREATION FUNCTIONS
 #______________________________________________________________________________________
 
+def dnd_page(box_files = None):
+	#Creates prompt text for drag and drop page.
+	dnd_prompt = tk.Text(window, font = ('Arial', 22), background = "light gray", width = 53, height = 3, highlightbackground= "light gray")
+	dnd_prompt.place(x=50, y=25)
+	dnd_prompt.tag_configure("center", justify='center')
+	dnd_prompt.insert('1.0', "Step 1:\nDrag and drop files in box below,\nthen convert to PDF with Convert Button below.")
+	dnd_prompt.tag_add("center", "1.0", "end")
+	dnd_prompt.config(state='disabled')
+
+	#Creates drag and drop list box.
+	list_box = tk.Listbox(window, selectmode=tk.SINGLE, background="#999999", highlightthickness = 2, highlightbackground= "gray25", highlightcolor= "gray25", width = 63, height = 15, font = ('Arial', 18))
+	list_box.place(x= 50, y= 120)
+	list_box.drop_target_register(DND_FILES)
+	list_box.dnd_bind("<<Drop>>", drop_in)
+	file_location = [list_box.get(0, last=None)]
+
+	if box_files:
+		print("hi!")
+
+	#If convert button is pressed, get contents of listbox and convert.
+	convert_button = Button(window, text= "Convert Files", command = convert, bg = "dodger blue", font=('Arial', 30), borderless = 1)
+	convert_button.place(x=275, y=500)
+
+	#If delete button is pressed, remove selection from the listbox.
+	delete_button = Button(window, text="Delete Selection(s)", command = delete_selection, background = "dodger blue", font=('Arial', 20), borderless = 1)
+	delete_button.place(x=550, y=500)
+
+	#If add file button is pressed, opens file explorer window to add files to listbox.
+	add_file_button = Button(window, text="Add File(s)", command = add_file, background = "dodger blue", font=('Arial', 20), borderless = 1)
+	add_file_button.place(x=50, y=500)
+
+	return dnd_prompt, list_box, convert_button, delete_button, add_file_button, file_location
+
 #Creates converting page.
 def convert_page():
 	#Destroys drag and drop page.
@@ -91,13 +130,14 @@ def convert_page():
 	convert_progress.config(state='disabled')
 
 	#When cancel button is pressed, returns back to drag and drop page.
-	cancel_button = Button(window, text= "Cancel", command = lambda: batch_conversion.cancelled(), background = "dodger blue", font=('Arial', 30), borderless = 1)
+	cancel_button = Button(window, text= "Cancel", command = lambda: batch_conversion.set_cancelled(), background = "dodger blue", font=('Arial', 30), borderless = 1)
 	cancel_button.place(x=350, y=300)
+	return convert_progress, cancel_button
 
 #Creates processing page.
-def ocr_page():
+def ocr_page(files):
 	#Destroys drag and drop page.
-	file_location = list_box.get(0, list_box.size())
+	file_location = files
 	dnd_prompt.destroy()
 	list_box.destroy()
 	convert_button.destroy()
@@ -138,8 +178,8 @@ def pop_up(message):
 	textMessage.pack(side="top", fill="x", pady=10)
 
 	#Creates confirm button to exit the pop-up window.
-	confirmButton = Button(popUpWindow, text= "Confirm", command = popUpWindow.destroy, bg = "dodger blue", font=('Arial', 30), borderless = 1)
-	confirmButton.pack()
+	#confirmButton = Button(popUpWindow, text= "Confirm", command = popUpWindow.destroy, bg = "dodger blue", font=('Arial', 30), borderless = 1)
+	#confirmButton.pack()
 	popUpWindow.mainloop()
 
 #______________________________________________________________________________________ 
@@ -151,31 +191,6 @@ window.geometry("800x600")
 window.title("OCHC File Transcription")
 window.resizable(False,False)
 
-#Creates prompt text for drag and drop page.
-dnd_prompt = tk.Text(window, font = ('Arial', 22), background = "light gray", width = 53, height = 3, highlightbackground= "light gray")
-dnd_prompt.place(x=50, y=25)
-dnd_prompt.tag_configure("center", justify='center')
-dnd_prompt.insert('1.0', "Step 1:\nDrag and drop files in box below,\nthen convert to PDF with Convert Button below.")
-dnd_prompt.tag_add("center", "1.0", "end")
-dnd_prompt.config(state='disabled')
-
-#Creates drag and drop list box.
-list_box = tk.Listbox(window, selectmode=tk.SINGLE, background="#999999", highlightthickness = 2, highlightbackground= "gray25", highlightcolor= "gray25", width = 63, height = 15, font = ('Arial', 18))
-list_box.place(x= 50, y= 120)
-list_box.drop_target_register(DND_FILES)
-list_box.dnd_bind("<<Drop>>", drop_in)
-file_location = [list_box.get(0, last=None)]
-
-#If convert button is pressed, get contents of listbox and convert.
-convert_button = Button(window, text= "Convert Files", command = convert, bg = "dodger blue", font=('Arial', 30), borderless = 1)
-convert_button.place(x=275, y=500)
-
-#If delete button is pressed, remove selection from the listbox.
-delete_button = Button(window, text="Delete Selection(s)", command = delete_selection, background = "dodger blue", font=('Arial', 20), borderless = 1)
-delete_button.place(x=550, y=500)
-
-#If add file button is pressed, opens file explorer window to add files to listbox.
-add_file_button = Button(window, text="Add File(s)", command = add_file, background = "dodger blue", font=('Arial', 20), borderless = 1)
-add_file_button.place(x=50, y=500)
+dnd_prompt, list_box, convert_button, delete_button, add_file_button, file_location = dnd_page()
 
 window.mainloop()
