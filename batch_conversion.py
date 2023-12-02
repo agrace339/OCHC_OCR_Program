@@ -43,14 +43,13 @@ def folder_to_pdf(folder_name):
 		f.write(img2pdf.convert(imgs))
 
 def convert(file):
-
 	#Check if cancelled is set True.
 	global cancelled
 	if cancelled:
 		return
 	#Regular expressions to determine if input element is file or folder.
-	in_file = re.match(r"[/a-zA-Z0-9]+.(jpg|tif)", file)
-	in_folder = re.match(r"/[a-zA-Z0-9]+", file)
+	in_file = re.match(r"[/a-zA-Z0-9 ]+.(jpg|tif)", file)
+	in_folder = re.match(r"/[a-zA-Z0-9 ]+", file)
 
 	#If single file given, convert just that file to a pdf.
 	if in_file:
@@ -63,13 +62,15 @@ def convert(file):
 		raise Exception("Not valid file or folder name.")
 
 def set_cancelled():
-    #Function to set the 'cancelled' variable
-    cancelled = True
+	#Function to set the 'cancelled' variable
+	cancelled = True
+	exit()
+	#Relaunch program with saved list box elements
 
 def main(files):
 	global cancelled
 	if cancelled:
-		raise Exception("Process cancelled.")
+		return
 	#If no JPEG or TIFF file given, raise error.
 	if not files:
 		raise Exception("No file given.")
