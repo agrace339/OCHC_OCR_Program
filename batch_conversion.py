@@ -15,6 +15,8 @@ def file_to_pdf(file):
 	global cancelled
 	if cancelled:
 		return
+    	if file.startswith('{') and file.endswith('}'):
+		file = file[1:-1]
 	match = re.search(r"(\w)+.(jpg|tif)", file)
 	if match:
 		title = (match.group())[0:-4] + ".pdf"
@@ -32,6 +34,8 @@ def folder_to_pdf(folder_name):
 	global cancelled
 	if cancelled:
 		return
+	if file.startswith('{') and file.endswith('}'):
+		file = file[1:-1]
 	imgs = []
 	for r, _, f in os.walk(img_dir):
 		for fname in f:
