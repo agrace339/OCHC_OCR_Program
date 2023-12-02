@@ -15,13 +15,13 @@ def file_to_pdf(file):
 	global cancelled
 	if cancelled:
 		return
-    	if file.startswith('{') and file.endswith('}'):
-		file = file[1:-1]
 	match = re.search(r"(\w)+.(jpg|tif)", file)
 	if match:
 		title = (match.group())[0:-4] + ".pdf"
+		pdf_loc = file + ".pdf"
 	with open(title,"wb") as f:
 		f.write(img2pdf.convert(file))
+	return pdf_loc
 
 def folder_to_pdf(folder_name):
 #Convert all JPEG files in a folder into one multi-page pdf file.
@@ -34,17 +34,20 @@ def folder_to_pdf(folder_name):
 	global cancelled
 	if cancelled:
 		return
-	if file.startswith('{') and file.endswith('}'):
-		file = file[1:-1]
 	imgs = []
 	for r, _, f in os.walk(img_dir):
 		for fname in f:
 			if not fname.endswith(".jpg") and not fname.endswith(".tif"):
 				continue
 			imgs.append(os.path.join(r, fname))
+	folder_index = folder_name.rindex("/")
+	if folder_index != -1:
+		title = folder_name[folder_index+1:] + ".pdf"
+		pdf_loc = folder_name + ".pdf"
 	#Converts all images in directory to pdfs.
-	with open("name.pdf","wb") as f:
+	with open(title, "wb") as f:
 		f.write(img2pdf.convert(imgs))
+	return pdf_loc
 
 def convert(file):
 	#Check if cancelled is set True.
@@ -57,13 +60,14 @@ def convert(file):
 
 	#If single file given, convert just that file to a pdf.
 	if in_file:
-		file_to_pdf(file)
+		pdf_loc = file_to_pdf(file)
 	#If folder is given, convert all image files to pdfs in folder.
 	elif in_folder:
-		folder_to_pdf(file)
+		pdf_loc = folder_to_pdf(file)
 	#If argument is invalid, raise exception.
 	else:
 		raise Exception("Not valid file or folder name.")
+	return pdf_loc
 
 def set_cancelled():
 	#Function to set the 'cancelled' variable
@@ -80,11 +84,12 @@ def main(files):
 		raise Exception("No file given.")
 	
 	#Convert all files from list.
+	pdf_locs = []
 	files_completed = 0
 	for file in files:
-		convert(file)
+		pdf_locs.append(convert(file))
 		files_completed += 1
-
+	return pdf_locs
 
 if __name__ == '__main__':
 	main()
