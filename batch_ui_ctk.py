@@ -113,7 +113,7 @@ def dnd_page(box_files = None):
 	delete_button.place(x=550, y=500)
 
 	#If add file button is pressed, opens file explorer window to add files to listbox.
-	add_file_button = ctk.CtkButton(window, text="Add File(s)", command = add_file)
+	add_file_button = ctk.CTkButton(window, text="Add File(s)", command = add_file)
 	add_file_button.place(x=50, y=500)
 
 	return dnd_prompt, list_box, convert_button, delete_button, add_file_button, file_location
@@ -181,7 +181,7 @@ def pop_up(message):
 	popUpWindow.title("OCHC File Transcription")
 
 	#Displays inputted message.
-	textMessage = ctk.CtkLabel(popUpWindow, text=message, background = "light gray", font = ('Arial', 18))
+	textMessage = ctk.CTkLabel(master = popUpWindow, text=message)
 	textMessage.pack(side="top", fill="x", pady=10)
 
 	#Creates confirm button to exit the pop-up window.
