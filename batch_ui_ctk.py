@@ -198,6 +198,7 @@ window.geometry("800x600")
 window.title("OCHC File Transcription")
 window.resizable(False,False)
 ctk.set_appearance_mode("dark")
+ctk.set_default_color_theme("blue")
 
 dnd_prompt, list_box, convert_button, delete_button, add_file_button, file_location = dnd_page()
 
