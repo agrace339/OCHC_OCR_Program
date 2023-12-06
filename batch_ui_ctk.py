@@ -121,6 +121,8 @@ def dnd_page(box_files = None):
 		convert_button.configure(state="disabled", text="No files added.")
 	if (list_box.size() >= 50):
 		convert_button.configure(state="disabled", text="Max limit files reached.")
+	else:
+		convert_button.configure(state="enabled", text="Add Files(s))
 
 	return dnd_prompt, list_box, convert_button, delete_button, add_file_button, file_location
 
