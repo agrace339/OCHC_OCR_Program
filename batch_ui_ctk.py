@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import ttk
 from TkinterDnD2 import DND_FILES, TkinterDnD
+from tkinterdnd2 import DND_FILES, TkinterDnD
 import customtkinter as ctk #Install: pip3 install customtkinter
 import batch_conversion
 import google_document_ai
