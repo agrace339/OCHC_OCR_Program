@@ -89,14 +89,14 @@ def dnd_page(box_files = None):
 	#Creates prompt text for drag and drop page.
 	# dnd_prompt = tk.Text(window, font = ('Arial', 22), background = "light gray", width = 53, height = 3, highlightbackground= "light gray")
 	dnd_prompt = ctk.CTkLabel(window, text="Step 1:\nDrag and drop files in box below,\nthen convert to PDF with Convert Button below.", width = 53, height = 3, font=ctk.CTkFont(size=22, weight="bold"))
-	dnd_prompt.place(x=50, y=25)
-	dnd_prompt.tag_configure("center", justify='center')
+	dnd_prompt.place(x=175, y=25)
+	#dnd_prompt.tag_configure("center", justify='center')
 	# dnd_prompt.insert('1.0', "Step 1:\nDrag and drop files in box below,\nthen convert to PDF with Convert Button below.")
-	dnd_prompt.tag_add("center", "1.0", "end")
+	#dnd_prompt.tag_add("center", "1.0", "end")
 	dnd_prompt.configure(state='disabled')
 
 	#Creates drag and drop list box.
-	list_box = tk.Listbox(window, selectmode=tk.SINGLE, background="#A9A9A9", foreground="white", highlightthickness = 2, highlightbackground= "gray25", highlightcolor= "gray25", width = 63, height = 15, font = ('Arial', 18))
+	list_box = tk.Listbox(window, selectmode=tk.SINGLE, background="gray10", foreground="white", highlightthickness = 2, highlightbackground= "gray25", highlightcolor= "gray25", width = 63, height = 15, font = ('Arial', 18))
 	list_box.place(x= 50, y= 120)
 	list_box.drop_target_register(DND_FILES)
 	list_box.dnd_bind("<<Drop>>", drop_in)
@@ -122,7 +122,7 @@ def dnd_page(box_files = None):
 	if (list_box.size() >= 50):
 		convert_button.configure(state="disabled", text="Max limit files reached.")
 	else:
-		convert_button.configure(state="enabled", text="Add Files(s))
+		convert_button.configure(state="enabled", text="Add Files(s)")
 
 	return dnd_prompt, list_box, convert_button, delete_button, add_file_button, file_location
 
@@ -161,9 +161,9 @@ def ocr_page(files):
 
 	#Creates new OCR page.
 	#Creates OCR text prompt.
-	ocr_prompt = tk.Text(window, font = ('Arial', 22), background = "light gray", width = 53, height = 3, highlightbackground= "light gray")
-	ocr_prompt.place(x=75, y=200)
-	ocr_prompt.tag_configure("center", justify='center')
+	ocr_prompt = ctk.CTkLabel(master = window, text = "Step 2:\nFile(s) have been converted to PDFs.\nPerform transcription?", width = 53, height = 3, font=ctk.CTkFont(size=22, weight="bold"))
+	ocr_prompt.place(x=240, y=200)
+	#ocr_prompt.tag_configure("center", justify='center')
 	# progress_bar = ttk.Progressbar(maximum=100)
 	# progress_bar.place(x=75, y=200, width=100)
 	# files_completed = batch_conversion.main(files_completed)
@@ -172,9 +172,9 @@ def ocr_page(files):
 	# 	file_percentage = (int((files_completed / files))) * 100
 	# 	progress_bar.set(file_percentage)
 
-	ocr_prompt.insert('1.0', "Step 2:\nFile(s) have been converted to PDFs.\nPerform transcription?")
-	ocr_prompt.tag_add("center", "1.0", "end")
-	ocr_prompt.config(state='disabled')
+	#ocr_prompt.insert('1.0', "Step 2:\nFile(s) have been converted to PDFs.\nPerform transcription?")
+	#ocr_prompt.tag_add("center", "1.0", "end")
+	ocr_prompt.configure(state='disabled')
 
 	#When OCR button is pressed, transcribes all files inputted into drag and drop
 	ocr_button = ctk.CTkButton(window, text= "Yes", command = lambda: ocr(file_location))
