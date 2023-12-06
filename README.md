@@ -5,6 +5,10 @@
 <br>Download and install tkdnd2.8 in \tcl of Python install. https://sourceforge.net/projects/tkdnd/
 <br>Download and install TkinterDnD2 in the \Lib\site-packages of Python install. https://sourceforge.net/projects/tkinterdnd/
 <br>Make sure that the interpreter you use to run and compiler batch_ui.py is using the same install folder of Python that the TkinterDnD is installed.
+<br>Additionally, install CustomTkinter via pip install.
+```
+pip install customtkinter
+```
 
 ## How to Set Up batch_conversion.py - Batch Conversion from TIFF and JPEG files to PDF files
 Install the necessary package, img2pdf.
