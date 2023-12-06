@@ -32,7 +32,8 @@ Go to https://cloud.google.com/sdk/docs/install to install Google Cloud SDK.
 <br>Commands may need to be run multiple times
 <br>It should be all set!
 
-The final step is the set the credentials for Google Document AI. These credentials are in the JSON file in the directory. To set it, where JSON_PATH is the path to the credential file,
+The final step is the set the credentials for Google Document AI. These credentials are in the JSON file in the directory. To set it on Mac, where JSON_PATH is the path to the credential file,
 ```
 export GOOGLE_APPLICATION_CREDENTIALS=JSON_PATH
 ```
+<br>To set it on Windows, you must edit environment variables from Control Panel. Click on 'New...' under 'User variables for USER' and set the Variable name to GOOGLE_APPLICATION_CREDENTIALS and the Variable value to the JSON_PATH which is the path to the credential file.
