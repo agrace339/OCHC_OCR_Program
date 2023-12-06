@@ -36,4 +36,7 @@ The final step is the set the credentials for Google Document AI. These credenti
 ```
 export GOOGLE_APPLICATION_CREDENTIALS=JSON_PATH
 ```
-<br>To set it on Windows, you must edit environment variables from Control Panel. Click on 'New...' under 'User variables for USER' and set the Variable name to GOOGLE_APPLICATION_CREDENTIALS and the Variable value to the JSON_PATH which is the path to the credential file.
+<br>To set it on Windows, you must edit environment variables from Control Panel. 
+<br>Click on 'New...' under 'User variables for USER'
+<br>Set the Variable name to GOOGLE_APPLICATION_CREDENTIALS
+<br>Set the Variable value to the JSON_PATH which is the path to the credential file.
