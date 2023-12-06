@@ -1,7 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
-from TkinterDnD2 import DND_FILES, TkinterDnD
-#from tkinterdnd2 import DND_FILES, TkinterDnD
+from tkinterdnd2 import DND_FILES, TkinterDnD
 import customtkinter as ctk #Install: pip3 install customtkinter
 import batch_conversion
 import google_document_ai
@@ -13,7 +12,7 @@ import os.path
 #Install tkdnd2.8 in \tcl of Python install. https://sourceforge.net/projects/tkdnd/
 #Install TkinterDnD2 in the \Lib\site-packages of Python install. https://sourceforge.net/projects/tkinterdnd/
 
-#Retrieved from TkinterDnD source code: https://github.com/pmgagne/tkinterdnd2 
+#Retrieved from TkinterDnD source code: https://github.com/pmgagne/tkinterdnd2
 class Tk(ctk.CTk, TkinterDnD.DnDWrapper):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -27,17 +26,22 @@ class Tk(ctk.CTk, TkinterDnD.DnDWrapper):
 
 # When a file is dragged into the box, the file path is dropped into the list box.
 def drop_in(event):
-	list_box.insert("end", event.data)	
+	list_box.insert("end", event.data)
 
 # Deletes selection from button press.
 def delete_selection():
 	selection = list_box.curselection()
-	for s in selection[::-1]: 
-		list_box.delete(selection) 
+	for s in selection[::-1]:
+		list_box.delete(selection)
 
 #Opens file explorer window to add files to listbox
 def add_file():
-	folder_path = filedialog.askdirectory()  #Open a folder selection dialog
+	file_path = filedialog.askopenfilenames(title="Select Image Files", filetypes=[(".jpg, .tif, .dir", ".jpg .tif .dir")])  #Open a file selection dialog
+	list_box.insert(tk.END, file_path)
+
+#Opens file explorer window to add folder to listbox
+def add_folder():
+	folder_path = filedialog.askdirectory(title="Select Image Folder", mustexist=True)  #Open a folder selection dialog
 	list_box.insert(tk.END, folder_path)
 
 #______________________________________________________________________________________
@@ -89,81 +93,87 @@ def ocr(file_location):
 def dnd_page(box_files = None):
 	#Creates prompt text for drag and drop page.
 	# dnd_prompt = tk.Text(window, font = ('Arial', 22), background = "light gray", width = 53, height = 3, highlightbackground= "light gray")
-	dnd_prompt = ctk.CTkLabel(window, text="Step 1:\nDrag and drop files in box below,\nthen convert to PDF with Convert Button below.", width = 53, height = 3, font=ctk.CTkFont(size=22, weight="bold"))
-	dnd_prompt.place(x=175, y=25)
+    dnd_prompt = ctk.CTkLabel(window, text="Step 1:\nDrag and drop files in box below,\nthen convert to PDF with Convert Button below.", width = 53, height = 3, font=ctk.CTkFont(size=22, weight="bold"))
+    dnd_prompt.place(x=160, y=25)
 	#dnd_prompt.tag_configure("center", justify='center')
 	# dnd_prompt.insert('1.0', "Step 1:\nDrag and drop files in box below,\nthen convert to PDF with Convert Button below.")
 	#dnd_prompt.tag_add("center", "1.0", "end")
-	dnd_prompt.configure(state='disabled')
+    dnd_prompt.configure(state='disabled')
 
 	#Creates drag and drop list box.
-	list_box = tk.Listbox(window, selectmode=tk.SINGLE, background="gray10", foreground="white", highlightthickness = 2, highlightbackground= "gray25", highlightcolor= "gray25", width = 63, height = 15, font = ('Arial', 18))
-	list_box.place(x= 50, y= 120)
-	list_box.drop_target_register(DND_FILES)
-	list_box.dnd_bind("<<Drop>>", drop_in)
-	file_location = [list_box.get(0, last=None)]
+    list_box = tk.Listbox(window, selectmode=tk.SINGLE, background="gray10", foreground="white", highlightthickness = 2, highlightbackground= "gray25", highlightcolor= "gray25", width = 53, height = 13, font = ('Arial', 18))
+    list_box.place(x= 50, y= 120)
+    list_box.drop_target_register(DND_FILES)
+    list_box.dnd_bind("<<Drop>>", drop_in)
+    file_location = [list_box.get(0, last=None)]
 
 	#if box_files:
 	#	print("hi!")
 
 	#If convert button is pressed, get contents of listbox and convert.
-	convert_button = ctk.CTkButton(window, text= "Convert Files", command = convert)
-	convert_button.place(x=300, y=500)
+    convert_button = ctk.CTkButton(window, text= "Convert Files", command = convert)
+    convert_button.place(x=417, y=500)
 
-	#If delete button is pressed, remove selection from the listbox.
-	delete_button = ctk.CTkButton(window, text="Delete Selection(s)", command = delete_selection)
-	delete_button.place(x=600, y=500)
+    #If delete button is pressed, remove selection from the listbox.
+    delete_button = ctk.CTkButton(window, text="Delete Selection(s)", command = delete_selection)
+    delete_button.place(x=600, y=500)
+    
+    #If add file button is pressed, opens file explorer window to add files to listbox.
+    add_file_button = ctk.CTkButton(window, text="Add File(s)", command = add_file)
+    add_file_button.place(x=50, y=500)
 
-	#If add file button is pressed, opens file explorer window to add files to listbox.
-	add_file_button = ctk.CTkButton(window, text="Add File(s)", command = add_file)
-	add_file_button.place(x=50, y=500)
+    #If add folder button is pressed, opens file explorer window to add folders to listbox.
+    add_folder_button = ctk.CTkButton(window, text="Add Folder", command = add_folder)
+    add_folder_button.place(x=233, y=500)
+    
+	#if (list_box.size() == 0):
+	#	convert_button.configure(state="disabled", text="No files added.")
+	#elif (list_box.size() >= 50):
+	#	convert_button.configure(state="disabled", text="Max limit files reached.")
+	#elif (list_box.size() >= 1):
+	#	convert_button.configure(state="enabled", text="Convert Files")
 
-	if (list_box.size() == 0):
-		convert_button.configure(state="disabled", text="No files added.")
-	if (list_box.size() >= 50):
-		convert_button.configure(state="disabled", text="Max limit files reached.")
-	else:
-		convert_button.configure(state="enabled", text="Add Files(s)")
-
-	return dnd_prompt, list_box, convert_button, delete_button, add_file_button, file_location
+    return dnd_prompt, list_box, convert_button, delete_button, add_file_button, add_folder_button, file_location
 
 #Creates converting page.
 def convert_page():
 	#Destroys drag and drop page.
-	dnd_prompt.destroy()
-	list_box.destroy()
-	convert_button.destroy()
-	delete_button.destroy()
-	add_file_button.destroy()
+    dnd_prompt.destroy()
+    list_box.destroy()
+    convert_button.destroy()
+    delete_button.destroy()
+    add_file_button.destroy()
+    add_folder_button.destroy()
 
 	#Creates new Convert page.
 	#Creates Convert text prompt.
-	convert_progress = tk.Text(window, font = ('Arial', 22), background = "light gray", width = 53, height = 3, highlightbackground= "light gray")
-	convert_progress.place(x=75, y=200)
-	convert_progress.tag_configure("center", justify='center')
-	convert_progress.insert('1.0', "Step 2:\nFile(s) are currently converting into pdfs...")
-	convert_progress.tag_add("center", "1.0", "end")
-	convert_progress.config(state='disabled')
+    convert_progress = tk.Text(window, font = ('Arial', 22), background = "light gray", width = 53, height = 3, highlightbackground= "light gray")
+    convert_progress.place(x=75, y=200)
+    convert_progress.tag_configure("center", justify='center')
+    convert_progress.insert('1.0', "Step 2:\nFile(s) are currently converting into pdfs...")
+    convert_progress.tag_add("center", "1.0", "end")
+    convert_progress.config(state='disabled')
 
 	#When cancel button is pressed, returns back to drag and drop page.
-	cancel_button = ctk.CTkButton(window, text= "Cancel", command = lambda: batch_conversion.set_cancelled())
-	cancel_button.place(x=350, y=300)
-	return convert_progress, cancel_button
+    cancel_button = ctk.CTkButton(window, text= "Cancel", command = lambda: batch_conversion.set_cancelled())
+    cancel_button.place(x=350, y=300)
+    return convert_progress, cancel_button
 
 #Creates processing page.
 def ocr_page(files):
 	#Destroys drag and drop page.
-	file_location = files
-	dnd_prompt.destroy()
-	list_box.destroy()
-	convert_button.destroy()
-	delete_button.destroy()
-	add_file_button.destroy()
-
+    file_location = files
+    dnd_prompt.destroy()
+    list_box.destroy()
+    convert_button.destroy()
+    delete_button.destroy()
+    add_file_button.destroy()
+    add_folder_button.destroy()
+    
 	#Creates new OCR page.
 	#Creates OCR text prompt.
-	ocr_prompt = ctk.CTkLabel(master = window, text = "Step 2:\nFile(s) have been converted to PDFs.\nPerform transcription?", width = 53, height = 3, font=ctk.CTkFont(size=22, weight="bold"))
-	ocr_prompt.place(x=240, y=200)
+    ocr_prompt = ctk.CTkLabel(master = window, text = "Step 2:\nFile(s) have been converted to PDFs.\nPerform transcription?", width = 53, height = 3, font=ctk.CTkFont(size=22, weight="bold"))
+    ocr_prompt.place(x=240, y=200)
 	#ocr_prompt.tag_configure("center", justify='center')
 	# progress_bar = ttk.Progressbar(maximum=100)
 	# progress_bar.place(x=75, y=200, width=100)
@@ -175,11 +185,11 @@ def ocr_page(files):
 
 	#ocr_prompt.insert('1.0', "Step 2:\nFile(s) have been converted to PDFs.\nPerform transcription?")
 	#ocr_prompt.tag_add("center", "1.0", "end")
-	ocr_prompt.configure(state='disabled')
+    ocr_prompt.configure(state='disabled')
 
 	#When OCR button is pressed, transcribes all files inputted into drag and drop
-	ocr_button = ctk.CTkButton(window, text= "Yes", command = lambda: ocr(file_location))
-	ocr_button.place(x=350, y=300)
+    ocr_button = ctk.CTkButton(window, text= "Yes", command = lambda: ocr(file_location))
+    ocr_button.place(x=350, y=300)
 
 # Creates pop-up window with a displayed message.
 def pop_up(message):
@@ -198,7 +208,7 @@ def pop_up(message):
 	#confirmButton.pack()
 	popUpWindow.mainloop()
 
-#______________________________________________________________________________________ 
+#______________________________________________________________________________________
 
 #Create Tkinter window.
 window = Tk()
@@ -209,6 +219,6 @@ window.resizable(False,False)
 ctk.set_appearance_mode("dark")
 ctk.set_default_color_theme("blue")
 
-dnd_prompt, list_box, convert_button, delete_button, add_file_button, file_location = dnd_page()
+dnd_prompt, list_box, convert_button, delete_button, add_file_button, add_folder_button, file_location = dnd_page()
 
 window.mainloop()
