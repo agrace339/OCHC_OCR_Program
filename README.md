@@ -31,6 +31,8 @@ pip install --upgrade google-cloud-storage
 pip install --upgrade google-cloud-documentai-toolbox
 pip install fpdf
 pip install unidecode
+pip install aspose-words
+pip install typing
 ```
 Go to https://cloud.google.com/sdk/docs/install to install Google Cloud SDK.
 <br>Extract archive and run ```./google-cloud-sdk/install.sh``` and reply no, yes, no to the prompts.
