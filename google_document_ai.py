@@ -92,6 +92,7 @@ class DocumentAI:
         
         self.__normalFileHandler(name, file_path, mime_type, output_name)
 
+    # Creates a pdf file with a title
     def __createFirstPage(self, file_name, text):
         pdf = PDF()
         pdf.add_page()
@@ -102,6 +103,7 @@ class DocumentAI:
             pdf.multi_cell(200, 10, txt = unidecode(line), align = 'L')
         return pdf
     
+    # Adds pages to a pdf without including a title
     def __createPage(self, pdf, text):
         pdf.add_page()
         pdf.set_font("Arial", size=12)
@@ -139,6 +141,7 @@ class DocumentAI:
         # Save text as document
         return document_object.text
 
+    # Handles large pdfs by separating them by page and then combining the output as a pdf
     def __largeFileHandler(self, file_name, file_path, output_name):
         doc = aw.Document(file_path)
 
@@ -153,9 +156,9 @@ class DocumentAI:
             text = self.__makeTextFile(f"temp/Output_{page + 1}.pdf", "application/pdf")
             self.__createPage(pdf, text)
         
-        pdf.output(output_name)
-        os.rmdir("temp")
+        pdf.output(output_name) 
     
+    # Handles any file that is below the document size limit
     def __normalFileHandler(self, file_name, file_path, mime_type, output_name):
         text = self.__makeTextFile(file_path, mime_type)
         pdf = self.__createFirstPage(file_name, text)
