@@ -1,5 +1,6 @@
 import os
 import re
+import aspose.words as aw
 from typing import Optional
 from venv import create
 from fpdf import FPDF
@@ -68,37 +69,48 @@ class DocumentAI:
     # Transcribes individual PDF file.
     def transcribeFile(self, file_path, output_type):
         name = file_path.split("/")[-1]
+        file_size = os.path.getsize(file_path)
+        output_name = name.split(".")[0] + ".pdf"
         # Refer to https://cloud.google.com/document-ai/docs/file-types for supported file types
         # Reads from ./files path and identifies files that can be transcribed
-        if ".jpg" in name.lower():
+        if ".ds_store" in name.lower():
+            return
+        if ".pdf" in name.lower():
+            mime_type = "application/pdf"
+            if (file_size > 20500000):
+                self.__largeFileHandler(name, file_path, output_name)
+        elif ".jpg" in name.lower():
             mime_type = "image/jpeg"
+            if (file_size > 20500000):
+                raise Exception("File size is too large")
         elif ".tif" in name.lower():
             mime_type = "image/tiff"
-        elif ".pdf" in name.lower():
-            mime_type = "application/pdf"
-        elif ".ds_store" in name.lower():
-            return
+            if (file_size > 20500000):
+                raise Exception("File size is too large")
         else:
-            print("Unsupported file type")
-            return
-        self.__makeTextFile(name, file_path, mime_type, output_type)
+            raise Exception("Unsupported file type")
+        
+        self.__normalFileHandler(name, file_path, mime_type, output_name)
 
-    def __outputFile(self, file_name, text, output_type):
-        if output_type == ".txt":
-            with open(file_name, "w") as text_file:
-                text_file.write(text)
-        elif output_type == ".pdf":
-            pdf = PDF()
-            pdf.add_page()
-            pdf.set_font("Arial", 'B', size=15)
-            pdf.multi_cell(200, 10, 'Transcription of '+ file_name, align = 'C')
-            pdf.set_font("Arial", size=12)
-            for line in text.splitlines():
-                pdf.multi_cell(200, 10, txt = unidecode(line), align = 'L')
-            pdf.output(file_name + ".pdf")
+    def __createFirstPage(self, file_name, text):
+        pdf = PDF()
+        pdf.add_page()
+        pdf.set_font("Arial", 'B', size=15)
+        pdf.multi_cell(200, 10, 'Transcription of '+ file_name, align = 'C')
+        pdf.set_font("Arial", size=12)
+        for line in text.splitlines():
+            pdf.multi_cell(200, 10, txt = unidecode(line), align = 'L')
+        return pdf
+    
+    def __createPage(self, pdf, text):
+        pdf.add_page()
+        pdf.set_font("Arial", size=12)
+        for line in text.splitlines():
+            pdf.multi_cell(200, 10, txt = unidecode(line), align = 'L')
+        
 
     # Creates text file of transcribed file.
-    def __makeTextFile(self, file_name, file_path, mime_type, output_type):
+    def __makeTextFile(self, file_path, mime_type):
         global PROJECT_ID
         global LOCATION
         global PROCESSOR_ID
@@ -125,8 +137,29 @@ class DocumentAI:
         print("Document processing complete.")
 
         # Save text as document
-        output_name = file_name.split(".")[0]
-        self.__outputFile(output_name, document_object.text, output_type)
+        return document_object.text
+
+    def __largeFileHandler(self, file_name, file_path, output_name):
+        doc = aw.Document(file_path)
+
+        extractedPage = doc.extract_pages(0, 1)
+        extractedPage.save(f"temp/Output_1.pdf")
+        text = self.__makeTextFile(f"temp/Output_1.pdf", "application/pdf")
+        pdf = self.__createFirstPage(file_name, text)
+
+        for page in range(1, doc.page_count):
+            extractedPage = doc.extract_pages(page, 1)
+            extractedPage.save(f"temp/Output_{page + 1}.pdf")
+            text = self.__makeTextFile(f"temp/Output_{page + 1}.pdf", "application/pdf")
+            self.__createPage(pdf, text)
+        
+        pdf.output(output_name)
+        os.rmdir("temp")
+    
+    def __normalFileHandler(self, file_name, file_path, mime_type, output_name):
+        text = self.__makeTextFile(file_path, mime_type)
+        pdf = self.__createFirstPage(file_name, text)
+        pdf.output(output_name)
 
     # Uploads files to GCS Bucket
     def __uploadFiles(self, bucket_name, source_file_name, destination_blob_name):
