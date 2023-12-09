@@ -50,5 +50,3 @@ export GOOGLE_APPLICATION_CREDENTIALS=JSON_PATH
 <br>Click on 'New...' under 'User variables for USER'
 <br>Set the Variable name to ```GOOGLE_APPLICATION_CREDENTIALS```
 <br>Set the Variable value to the JSON_PATH which is the path to the credential file.
-
-r'(?:[a-zA-Z]:\\(?:[^\\:*?"<>|\r\n\s]+\\)*[^\\:*?"<>|\r\n\s]+)'
