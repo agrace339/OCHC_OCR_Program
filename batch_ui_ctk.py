@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
-from tkinterdnd2 import DND_FILES, TkinterDnD
+from TkinterDnD2 import DND_FILES, TkinterDnD
 import customtkinter as ctk #Install: pip3 install customtkinter
 import batch_conversion
 import google_document_ai
@@ -36,13 +36,15 @@ def delete_selection():
 
 #Opens file explorer window to add files to listbox
 def add_file():
-	file_path = filedialog.askopenfilenames(title="Select Image Files", filetypes=[(".jpg, .tif, .dir", ".jpg .tif .dir")])  #Open a file selection dialog
-	list_box.insert(tk.END, file_path)
+	file_path = filedialog.askopenfilenames(title="Select Image Files", filetypes=[(".jpg, .tif", ".jpg .tif")])  #Open a file selection dialog
+	if file_path:
+		list_box.insert(tk.END, file_path)
 
 #Opens file explorer window to add folder to listbox
 def add_folder():
 	folder_path = filedialog.askdirectory(title="Select Image Folder", mustexist=True)  #Open a folder selection dialog
-	list_box.insert(tk.END, folder_path)
+	if folder_path:
+		list_box.insert(tk.END, folder_path)
 
 #______________________________________________________________________________________
 #						MAIN BUTTON ACTION FUNCTIONS
@@ -56,11 +58,14 @@ def convert():
 	#Otherwise, batch convert all inputted files to pdfs, then display next page.
 	else:
 		files_list = []
-		box_files = list_box.get(0, 'end')
+		box_files = list_box.get(0, tk.END)
 		#Format list box files.
 		for i in range(len(box_files)):
-			box_file = box_files[i].replace("{", "")
+			box_file = str(box_files[i])
+			box_file = box_file.replace("{", "")
 			box_file = box_file.replace("}", "")
+			if (box_file[0] == "(") and (box_file[-1] == ")"): 
+				box_file = box_file.strip("()").replace("'", "").rstrip(',')
 			files_list.append(box_file)
 		#Show conversion progress page.
 		convert_progress, cancel_button = convert_page()
@@ -79,7 +84,6 @@ def convert():
 #Transcribes all documents inputted into drag and drop list box.
 def ocr(file_location):
 	document = google_document_ai.DocumentAI()
-
 	# Goes through each file dropped in the listbox and converts each one.
 	for file in file_location:
 		#If the current element is a file, transcribe just that file.
@@ -90,7 +94,7 @@ def ocr(file_location):
 			document.transcribeFolder(file, ".pdf")
 
 	#Creates pop-up window when transcription process is complete.
-	pop_up("Document processing complete!")
+	pop_up("Document processing complete!\nPlease close this window and\nthe application to restart.")
 
 #______________________________________________________________________________________
 #							NEW WINDOW CREATION FUNCTIONS
@@ -99,13 +103,13 @@ def ocr(file_location):
 #Creates drag and drop page.
 def dnd_page(box_files = None):
 	#Creates prompt text for drag and drop page.
-    dnd_prompt = ctk.CTkLabel(window, text="Step 1:\nDrag and drop files in box below,\nthen convert to PDF with Convert Button below.", width = 53, height = 3, font=ctk.CTkFont(size=22))
-    dnd_prompt.place(x=160, y=25)
+    dnd_prompt = ctk.CTkLabel(window, text="Step 1:\nDrag and drop files in box below,\nthen convert to PDF with Convert Button below.\n(MAX 50 FILES AT A TIME).", width = 53, height = 3, font=ctk.CTkFont(size=20))
+    dnd_prompt.place(x=187, y=25)
     dnd_prompt.configure(state='disabled')
 
 	#Creates drag and drop list box.
-    list_box = tk.Listbox(window, selectmode=tk.SINGLE, background="gray10", foreground="white", highlightthickness = 2, highlightbackground= "gray25", highlightcolor= "gray25", width = 53, height = 13, font = ('Arial', 18))
-    list_box.place(x= 100, y= 140)
+    list_box = tk.Listbox(window, selectmode=tk.SINGLE, background="gray10", foreground="white", highlightthickness = 2, highlightbackground= "gray25", highlightcolor= "gray25", width = 53, height = 13, font = ('Arial', 20))
+    list_box.place(x= 100, y= 150)
     list_box.drop_target_register(DND_FILES)
     list_box.dnd_bind("<<Drop>>", drop_in)
     file_location = [list_box.get(0, last=None)]
@@ -140,12 +144,9 @@ def convert_page():
 
 	#Creates new Convert page.
 	#Creates Convert text prompt.
-    convert_progress = tk.Text(window, font = ('Arial', 22), background = "light gray", width = 53, height = 3, highlightbackground= "light gray")
-    convert_progress.place(x=75, y=200)
-    convert_progress.tag_configure("center", justify='center')
-    convert_progress.insert('1.0', "Step 2:\nFile(s) are currently converting into pdfs...")
-    convert_progress.tag_add("center", "1.0", "end")
-    convert_progress.config(state='disabled')
+    convert_progress = ctk.CTkLabel(window, text = "Step 2:\nFile(s) are currently converting into pdfs...", width = 53, height = 3, font=ctk.CTkFont(size=22))
+    convert_progress.place(x=240, y=200)
+    convert_progress.configure(state='disabled')
 
 	#When cancel button is pressed, returns back to drag and drop page.
     cancel_button = ctk.CTkButton(window, text= "Cancel", command = lambda: batch_conversion.set_cancelled())
