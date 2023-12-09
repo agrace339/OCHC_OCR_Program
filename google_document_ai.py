@@ -69,11 +69,12 @@ class DocumentAI:
     
     # Transcribes individual PDF file.
     def transcribeFile(self, file_path, output_type):
-        # name = file_path.split("/")[-1]
+        regex_pattern = r"[^\\/]+$"
+        name = re.search(regex_pattern, file_path).group()
         file_size = os.path.getsize(file_path)
-        # output_name = name.split(".")[0] + ".pdf"
-        name = file_path
-        output_name = file_path
+        regex_pattern = r"\.[^.]+$"
+        output_name = re.sub(regex_pattern, '', name) + ".pdf"
+
         # Refer to https://cloud.google.com/document-ai/docs/file-types for supported file types
         # Reads from ./files path and identifies files that can be transcribed
         if ".ds_store" in name.lower():
@@ -82,7 +83,7 @@ class DocumentAI:
             mime_type = "application/pdf"
             if (file_size > 20500000):
                 self.__largeFileHandler(name, file_path, output_name)
-        elif ".jpg" in name.lower():
+        elif ".jpg" in name.lower() or ".jpeg" in name.lower():
             mime_type = "image/jpeg"
             if (file_size > 20500000):
                 raise Exception("File size is too large")
