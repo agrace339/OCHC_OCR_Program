@@ -35,9 +35,9 @@ class DocumentAI:
         global PROCESSOR_ID
         global RESOURCE_NAME
         global DOCAI_CLIENT
-        PROJECT_ID = "ochc-ocr"  # project name on Cloud Console
+        PROJECT_ID = "transcription-project-407614"  # project name on Cloud Console
         LOCATION = "us"  # Format is 'us' or 'eu'
-        PROCESSOR_ID = "3cb371dd084861ed"  # Create processor in Cloud Console, can be changed to test other processors
+        PROCESSOR_ID = "dd33faae7c525022"  # Create processor in Cloud Console, can be changed to test other processors
 
         DOCAI_CLIENT = documentai.DocumentProcessorServiceClient(
             client_options=ClientOptions(
