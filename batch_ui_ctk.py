@@ -8,6 +8,7 @@ from tkinter import filedialog
 from tkmacosx import Button
 import os
 import os.path
+import re
 
 #Install tkdnd2.8 in \tcl of Python install. https://sourceforge.net/projects/tkdnd/
 #Install TkinterDnD2 in the \Lib\site-packages of Python install. https://sourceforge.net/projects/tkinterdnd/
@@ -26,7 +27,11 @@ class Tk(ctk.CTk, TkinterDnD.DnDWrapper):
 
 # When a file is dragged into the box, the file path is dropped into the list box.
 def drop_in(event):
-	list_box.insert("end", event.data)
+        regex = r'(?:[a-zA-Z]:\(?:[^\\:*?"<>|\r\n\s]+\)*[^\\:*?"<>|\r\n\s]+)'
+        file_paths = re.findall(regex, event.data)
+        for file_path in file_paths:
+                if file_path:
+                        list_box.insert("end", file_path)
 
 # Deletes selection from button press.
 def delete_selection():
@@ -108,10 +113,18 @@ def dnd_page(box_files = None):
     dnd_prompt.configure(state='disabled')
 
 	#Creates drag and drop list box.
-    list_box = tk.Listbox(window, selectmode=tk.SINGLE, background="gray10", foreground="white", highlightthickness = 2, highlightbackground= "gray25", highlightcolor= "gray25", width = 53, height = 13, font = ('Arial', 20))
+    list_box = tk.Listbox(window, selectmode=tk.SINGLE, background="gray10", foreground="white", highlightthickness = 2, highlightbackground= "gray25", highlightcolor= "gray25", width = 53, height = 20, font = ('Arial', 11))
     list_box.place(x= 100, y= 150)
     list_box.drop_target_register(DND_FILES)
     list_box.dnd_bind("<<Drop>>", drop_in)
+    right_scrollbar = tk.Scrollbar(window)
+    right_scrollbar.place(x = 700, y = 100)
+    bottom_scrollbar = tk.Scrollbar(window)
+    bottom_scrollbar.place(x = 100, y = 100)
+    list_box.config(yscrollcommand = right_scrollbar.set, xscrollcommand = bottom_scrollbar.set)
+    right_scrollbar.config(command = list_box.yview)
+    bottom_scrollbar.config(command = list_box.xview)
+    
     file_location = [list_box.get(0, last=None)]
 
 	#If convert button is pressed, get contents of listbox and convert.
