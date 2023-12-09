@@ -62,7 +62,6 @@ class DocumentAI:
 
     # Transcribes all files within a folder.
     def transcribeFolder(self, folder_path, output_type):
-        print("folder_path: ", folder_path)
         dir_list = os.listdir(folder_path)
         
         for i in range(len(dir_list)):
@@ -74,9 +73,7 @@ class DocumentAI:
         file_size = os.path.getsize(file_path)
         # output_name = name.split(".")[0] + ".pdf"
         name = file_path
-        output_name = file_path        
-        print("file_path: ", file_path)
-        print("output_name: ", output_name)
+        output_name = file_path
         # Refer to https://cloud.google.com/document-ai/docs/file-types for supported file types
         # Reads from ./files path and identifies files that can be transcribed
         if ".ds_store" in name.lower():
