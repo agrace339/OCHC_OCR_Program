@@ -80,7 +80,9 @@ def main(files):
 	#Convert all files from list.
     pdf_locs = []
     files_completed = 0
-    for file in files:
+    regex = r'(?:[a-zA-Z]:\(?:[^\\:*?"<>|\r\n\s]+\)*[^\\:*?"<>|\r\n\s]+)'
+    file_paths = re.findall(regex, files)
+    for file in file_paths:
         pdf_locs.append(convert(file))
         files_completed += 1
     return pdf_locs
