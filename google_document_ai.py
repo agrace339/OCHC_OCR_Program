@@ -72,8 +72,10 @@ class DocumentAI:
         regex_pattern = r"[^\\/]+$"
         name = re.search(regex_pattern, file_path).group()
         file_size = os.path.getsize(file_path)
-        regex_pattern = r"\.[^.]+$"
-        output_name = re.sub(regex_pattern, '', name) + ".pdf"
+        # regex_pattern = r"\.[^.]+$"
+        # output_name = re.sub(regex_pattern, '', name) + "transcription.pdf"
+        print(file_path)
+        output_name = file_path[:-4] + "-transcribe.pdf"
 
         # Refer to https://cloud.google.com/document-ai/docs/file-types for supported file types
         # Reads from ./files path and identifies files that can be transcribed
