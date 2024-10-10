@@ -1,5 +1,7 @@
 # OCHC_OCR_Program
 
+A group project creating a transcription desktop app using Optical Character Recognition (OCR) through Google Document AI. This project was created to transcribe handwritten and print historical documents with easy-to-learn UI for our client, the Oneida County Historical Society.
+
 ## How to Set Up batch_ui.py - User Interface for the Batch Conversion code
 <br>In order to currently run the user interface, you will need to install TkinterDnD package:
 <br>Download and install tkdnd2.8 in \tcl of Python install. Check which binary you may need in the files section. https://sourceforge.net/projects/tkdnd/
